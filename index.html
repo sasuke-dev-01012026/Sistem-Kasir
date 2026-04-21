@@ -1,0 +1,3201 @@
+<!DOCTYPE html>
+<html lang="id" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kasir Warkop Cemara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <style>
+    :root {
+      --brand: #00e5a0;
+      --brand-dim: #00b87a;
+      --brand-glow: rgba(0,229,160,.18);
+      --sidebar-w: 248px;
+      --bg: #0a0e13;
+      --surface: #111620;
+      --surface2: #1a2030;
+      --border: #232d3f;
+      --text: #e2e8f0;
+      --muted: #6b7a99;
+      --danger: #ff5e6b;
+      --warn: #f59e0b;
+      --info: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; margin: 0; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: var(--sidebar-w); min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed; top: 0; left: 0; z-index: 1040;
+      display: flex; flex-direction: column;
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    #sidebar .brand {
+      padding: 1.4rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #sidebar .brand-name { font-size: 1.25rem; font-weight: 800; color: var(--brand); letter-spacing: -.5px; }
+    #sidebar .brand-sub { font-size: .65rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+    .nav-section-label {
+      font-size: .6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.2px; color: #3a4a60;
+      padding: .9rem 1.25rem .35rem;
+    }
+    .nav-link-side {
+      display: flex; align-items: center; gap: .7rem;
+      padding: .55rem 1.25rem;
+      color: var(--muted); font-weight: 600; font-size: .82rem;
+      border-left: 2px solid transparent; text-decoration: none;
+      transition: all .15s ease; border-radius: 0;
+    }
+    .nav-link-side:hover { color: var(--text); background: rgba(255,255,255,.04); }
+    .nav-link-side.active { color: var(--brand); background: var(--brand-glow); border-left-color: var(--brand); }
+    .nav-link-side i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .sidebar-footer { margin-top: auto; padding: 1rem 1.25rem; border-top: 1px solid var(--border); }
+
+    /* ── MAIN ── */
+    #main-content { margin-left: var(--sidebar-w); min-height: 100vh; }
+    #topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 56px;
+      position: sticky; top: 0; z-index: 1030;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .topbar-left { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+    .topbar-right { display: flex; align-items: center; gap: .75rem; flex-shrink: 0; }
+    .topbar-divider { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+    .topbar-page-desc {
+      font-size: .82rem; font-weight: 600; color: var(--muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .topbar-clock-wrap {
+      display: flex; align-items: center; gap: .35rem;
+      padding: .25rem .65rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    /* ── PAGE TRANSITIONS ── */
+    .page { display: none; animation: fadeSlide .22s ease; }
+    .page.active { display: block; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    /* ── CARDS ── */
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.1rem 1.35rem;
+      transition: border-color .2s;
+    }
+    .stat-card:hover { border-color: var(--brand); }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+    .stat-val { font-size: 1.6rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .stat-label { font-size: .7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+
+    /* ── TABLE ── */
+    .custom-table { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .custom-table thead th { background: var(--surface2); border-color: var(--border); color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .5px; padding: .8rem 1rem; font-weight: 700; }
+    .custom-table tbody td { border-color: var(--border); padding: .8rem 1rem; vertical-align: middle; }
+    .custom-table tbody tr:hover { background: rgba(255,255,255,.02); }
+
+    /* ── PRODUCT CARD ── */
+    .product-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; cursor: pointer;
+      transition: all .18s ease;
+    }
+    .product-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,229,160,.08); }
+    .product-body { padding: .75rem; }
+    .product-name { font-weight: 700; font-size: .85rem; }
+    .product-price { color: var(--brand); font-family: 'JetBrains Mono', monospace; font-size: .8rem; font-weight: 500; }
+    .product-category { font-size: .65rem; color: var(--muted); margin-bottom: .2rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ── CART ── */
+    .cart-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; height: calc(100vh - 120px);
+      display: flex; flex-direction: column;
+    }
+    .cart-item { border-bottom: 1px solid var(--border); padding: .65rem 1rem; }
+    .cart-items-scroll { overflow-y: auto; flex: 1; }
+    .cart-items-scroll::-webkit-scrollbar { width: 4px; }
+    .cart-items-scroll::-webkit-scrollbar-track { background: transparent; }
+    .cart-items-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .cart-footer { padding: .9rem 1rem; border-top: 1px solid var(--border); }
+
+    /* ── BADGES ── */
+    .badge-success-soft { background: rgba(0,229,160,.12); color: #00e5a0; font-weight: 600; }
+    .badge-warning-soft { background: rgba(245,158,11,.12); color: #f59e0b; font-weight: 600; }
+    .badge-danger-soft  { background: rgba(255,94,107,.12);  color: #ff5e6b; font-weight: 600; }
+    .badge-info-soft    { background: rgba(56,189,248,.12);  color: #38bdf8; font-weight: 600; }
+    .badge-purple-soft  { background: rgba(167,139,250,.12); color: #a78bfa; font-weight: 600; }
+
+    /* ── FORM CONTROLS ── */
+    .form-control, .form-select {
+      background: var(--surface2) !important;
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .85rem;
+      border-radius: 8px;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--brand) !important;
+      box-shadow: 0 0 0 3px rgba(0,229,160,.15) !important;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-brand { background: var(--brand); color: #0a0e13; font-weight: 700; border: none; transition: all .18s; border-radius: 9px; }
+    .btn-brand:hover { background: var(--brand-dim); color: #0a0e13; transform: translateY(-1px); }
+    .btn-brand:active { transform: none; }
+    .cat-btn.active { background: var(--brand) !important; color: #0a0e13 !important; border-color: var(--brand) !important; }
+
+    /* ── PANEL CARD ── */
+    .panel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+    .panel-card .panel-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); font-weight: 700; font-size: .9rem; }
+    .panel-card .panel-body { padding: 1.25rem; }
+    .laporan-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
+
+    /* ── MODAL ── */
+    .modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+    .modal-header { border-bottom: 1px solid var(--border); }
+    .modal-footer { border-top: 1px solid var(--border); }
+
+    /* ── UTILITIES ── */
+    .text-brand { color: var(--brand) !important; }
+    .bg-brand { background: var(--brand) !important; color: #0a0e13 !important; }
+    .text-muted-custom { color: var(--muted) !important; }
+
+    /* ── RIWAYAT FILTER BAR ── */
+    .filter-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem; }
+
+    /* ── RIWAYAT TRANSACTION CARDS ── */
+    .tx-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      transition: border-color .18s, box-shadow .18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .tx-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: 3px 0 0 3px;
+    }
+    .tx-card.tx-pesanan::before { background: var(--brand); }
+    .tx-card.tx-belanja::before { background: var(--danger); }
+    .tx-card.tx-hutang::before  { background: var(--warn); }
+    .tx-card:hover { border-color: rgba(0,229,160,.35); box-shadow: 0 4px 20px rgba(0,0,0,.25); }
+
+    .tx-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .55rem; }
+    .tx-card-id { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: var(--muted); font-weight: 500; }
+    .tx-card-time { font-size: .7rem; color: var(--muted); }
+    .tx-card-customer { font-weight: 700; font-size: .88rem; margin-bottom: .15rem; }
+    .tx-card-items { font-size: .75rem; color: var(--muted); margin-bottom: .55rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tx-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: .4rem; overflow: hidden; }
+    .tx-card-amounts { display: flex; gap: .6rem; flex-wrap: nowrap; align-items: center; flex-shrink: 1; min-width: 0; overflow: hidden; }
+    .tx-amount-item { display: flex; flex-direction: column; flex-shrink: 0; }
+    .tx-amount-label { font-size: .6rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+    .tx-amount-val { font-family: 'JetBrains Mono', monospace; font-size: .82rem; font-weight: 700; white-space: nowrap; }
+    .tx-card-badges { display: flex; align-items: center; gap: .3rem; flex-wrap: nowrap; flex-shrink: 0; overflow-x: auto; max-width: 100%; scrollbar-width: none; }
+    .tx-card-badges::-webkit-scrollbar { display: none; }
+
+    /* ── PRODUK CRUD ACTIONS ── */
+    .produk-action-btn { opacity: 0; transition: opacity .15s; }
+    .product-card:hover .produk-action-btn { opacity: 1; }
+
+    /* ── CUSTOM ORDER ITEM ── */
+    .custom-item-badge { background: rgba(167,139,250,.15); color: #a78bfa; border: 1px solid rgba(167,139,250,.3); font-size: .65rem; padding: .1rem .4rem; border-radius: 4px; font-weight: 700; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 767px) {
+      #sidebar { transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #main-content { margin-left: 0; }
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── METHOD BUTTONS ── */
+    .method-btn-active { background: var(--brand) !important; color: #0a0e13 !important; border: none !important; }
+    .method-btn-inactive { background: transparent; color: var(--muted); border-color: var(--border); }
+    .method-btn-inactive:hover { color: var(--text); border-color: var(--text); }
+
+    /* ── RIWAYAT SUMMARY CARDS ENHANCED ── */
+    #rwyt-summary-row .col-6,
+    #rwyt-summary-row .col-lg-4 { display: flex; }
+    .rwyt-stat-card {
+      border-radius: 16px;
+      padding: 1.1rem 1.25rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .rwyt-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.3);
+    }
+    .rwyt-stat-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 0 0 16px 16px;
+    }
+    .rwyt-card-transaksi { border-color: rgba(56,189,248,.25); }
+    .rwyt-card-transaksi:hover { border-color: rgba(56,189,248,.5); box-shadow: 0 8px 28px rgba(56,189,248,.08); }
+    .rwyt-card-transaksi::after { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
+
+    .rwyt-card-qr { border-color: rgba(167,139,250,.25); }
+    .rwyt-card-qr:hover { border-color: rgba(167,139,250,.5); box-shadow: 0 8px 28px rgba(167,139,250,.08); }
+    .rwyt-card-qr::after { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+
+    .rwyt-card-tunai { border-color: rgba(0,229,160,.25); }
+    .rwyt-card-tunai:hover { border-color: rgba(0,229,160,.5); box-shadow: 0 8px 28px rgba(0,229,160,.08); }
+    .rwyt-card-tunai::after { background: linear-gradient(90deg, #00e5a0, #00b87a); }
+
+    .rwyt-card-hutang { border-color: rgba(245,158,11,.25); }
+    .rwyt-card-hutang:hover { border-color: rgba(245,158,11,.5); box-shadow: 0 8px 28px rgba(245,158,11,.08); }
+    .rwyt-card-hutang::after { background: linear-gradient(90deg, #f59e0b, #d97706); }
+
+    .rwyt-card-pengeluaran { border-color: rgba(255,94,107,.25); }
+    .rwyt-card-pengeluaran:hover { border-color: rgba(255,94,107,.5); box-shadow: 0 8px 28px rgba(255,94,107,.08); }
+    .rwyt-card-pengeluaran::after { background: linear-gradient(90deg, #ff5e6b, #dc2626); }
+
+    .rwyt-card-omzet {
+      border-color: rgba(0,229,160,.4) !important;
+      background: linear-gradient(135deg, rgba(0,229,160,.07) 0%, var(--surface) 60%) !important;
+    }
+    .rwyt-card-omzet:hover { border-color: rgba(0,229,160,.7) !important; box-shadow: 0 8px 32px rgba(0,229,160,.12) !important; }
+    .rwyt-card-omzet::after { background: linear-gradient(90deg, #00e5a0, #38bdf8); }
+
+    .rwyt-icon-wrap {
+      width: 42px; height: 42px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; flex-shrink: 0;
+    }
+    .rwyt-card-label {
+      font-size: .62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--muted);
+      margin-bottom: .25rem;
+    }
+    .rwyt-card-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem; font-weight: 800;
+      line-height: 1;
+    }
+    .rwyt-card-sub {
+      font-size: .63rem; color: var(--muted);
+      margin-top: .3rem; display: flex; align-items: center; gap: .3rem;
+    }
+    .rwyt-card-badge {
+      font-size: .58rem; padding: .15rem .45rem;
+      border-radius: 20px; font-weight: 700; letter-spacing: .3px;
+    }
+    .rwyt-omzet-formula {
+      background: rgba(0,229,160,.08);
+      border: 1px solid rgba(0,229,160,.15);
+      border-radius: 8px;
+      padding: .3rem .6rem;
+      font-size: .65rem;
+      color: var(--muted);
+      margin-top: .5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── HOME PAGE ── */
+    .home-banner {
+      background: linear-gradient(135deg, rgba(0,229,160,.08) 0%, rgba(56,189,248,.05) 60%, var(--surface) 100%);
+      border: 1px solid rgba(0,229,160,.2);
+      border-radius: 18px;
+      padding: 1.4rem 1.6rem;
+    }
+    .home-greeting { font-size: 1.35rem; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
+    .home-sub { font-size: .78rem; color: var(--muted); margin-top: .25rem; font-weight: 500; }
+
+    .home-stat-card {
+      background: linear-gradient(145deg, var(--c1,rgba(0,229,160,.1)) 0%, var(--surface) 55%);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 1.1rem 1.2rem 1rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform .18s, box-shadow .18s;
+      height: 100%;
+    }
+    .home-stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .home-stat-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; margin-bottom: .7rem;
+    }
+    .home-stat-label { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: .3rem; }
+    .home-stat-val { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 800; line-height: 1; }
+    .home-stat-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: var(--bar, #00e5a0);
+      opacity: .6;
+      border-radius: 0 0 16px 16px;
+    }
+
+    .quick-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .9rem .5rem;
+      display: flex; flex-direction: column; align-items: center; gap: .4rem;
+      cursor: pointer; transition: all .18s;
+      color: var(--text); font-size: .75rem; font-weight: 700;
+    }
+    .quick-btn:hover {
+      background: rgba(255,255,255,.05);
+      border-color: var(--qc, var(--brand));
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+      transform: translateY(-2px);
+    }
+
+    .home-tx-row {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .65rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      transition: background .12s;
+    }
+    .home-tx-row:last-child { border-bottom: none; }
+    .home-tx-row:hover { background: rgba(255,255,255,.025); }
+    .home-tx-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    /* ── EXPORT GATE OVERLAY ── */
+    #export-gate {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(10,14,19,.97);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      animation: fadeIn .3s ease;
+    }
+    #export-gate.hidden { display: none; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .gate-card {
+      background: var(--surface);
+      border: 1px solid rgba(245,158,11,.4);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(245,158,11,.08), 0 20px 60px rgba(0,0,0,.6);
+      position: relative;
+      overflow: hidden;
+    }
+    .gate-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f59e0b, #ff5e6b, #f59e0b);
+      background-size: 200% 100%;
+      animation: shimmer 2s linear infinite;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    .gate-icon-wrap {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: rgba(245,158,11,.12);
+      border: 2px solid rgba(245,158,11,.35);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+      font-size: 2.2rem;
+      animation: pulse-warn 2s ease-in-out infinite;
+    }
+    @keyframes pulse-warn {
+      0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.3); }
+      50% { box-shadow: 0 0 0 14px rgba(245,158,11,.0); }
+    }
+    .gate-title { font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: .5rem; }
+    .gate-desc { font-size: .83rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+    .gate-time-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(245,158,11,.1);
+      border: 1px solid rgba(245,158,11,.25);
+      border-radius: 8px;
+      padding: .35rem .8rem;
+      font-size: .78rem;
+      color: #f59e0b;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    .gate-btn {
+      width: 100%;
+      padding: .85rem;
+      background: #f59e0b;
+      color: #0a0e13;
+      font-weight: 800;
+      font-size: .95rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all .18s;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    .gate-btn:hover { background: #d97706; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,.3); }
+    .gate-btn:active { transform: none; }
+    .gate-footer { margin-top: 1rem; font-size: .7rem; color: var(--muted); }
+
+    /* Notif banner di topbar */
+    #export-reminder-bar {
+      background: rgba(245,158,11,.1);
+      border-bottom: 1px solid rgba(245,158,11,.25);
+      padding: .45rem 1.5rem;
+      font-size: .75rem;
+      color: #f59e0b;
+      font-weight: 600;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .5rem;
+    }
+    #export-reminder-bar.hidden { display: none; }
+
+    /* ── AUTO LIGHT MODE (09:00–15:00) ── */
+    html[data-bs-theme="light"] {
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --surface2: #f1f5f9;
+      --border: #dde4ef;
+      --text: #1e293b;
+      --muted: #64748b;
+      --danger: #e53e4d;
+      --warn: #c77e06;
+      --info: #0284c7;
+    }
+    html[data-bs-theme="light"] body { background: var(--bg); color: var(--text); }
+    html[data-bs-theme="light"] .nav-section-label { color: #94a3b8; }
+    html[data-bs-theme="light"] .nav-link-side:hover { background: rgba(0,0,0,.04); }
+    html[data-bs-theme="light"] .nav-link-side.active { background: var(--brand-glow); }
+    html[data-bs-theme="light"] .custom-table tbody tr:hover { background: rgba(0,0,0,.025); }
+    html[data-bs-theme="light"] .product-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+    html[data-bs-theme="light"] .home-banner {
+      background: linear-gradient(135deg, rgba(0,229,160,.1) 0%, rgba(56,189,248,.07) 60%, #ffffff 100%);
+      border-color: rgba(0,229,160,.25);
+    }
+    html[data-bs-theme="light"] .home-stat-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,.1); }
+    html[data-bs-theme="light"] .tx-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+    html[data-bs-theme="light"] .rwyt-stat-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.1); }
+    html[data-bs-theme="light"] #export-gate { background: rgba(238,242,247,.97); }
+    html[data-bs-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+
+    /* Badge warna tetap terlihat di light mode */
+    html[data-bs-theme="light"] .badge-success-soft { background: rgba(0,180,125,.15); color: #00875f; }
+    html[data-bs-theme="light"] .badge-warning-soft { background: rgba(199,126,6,.15);  color: #a36200; }
+    html[data-bs-theme="light"] .badge-danger-soft  { background: rgba(229,62,77,.15);  color: #b02030; }
+    html[data-bs-theme="light"] .badge-info-soft    { background: rgba(2,132,199,.15);  color: #0369a1; }
+    html[data-bs-theme="light"] .badge-purple-soft  { background: rgba(124,58,237,.15); color: #6d28d9; }
+
+    /* Transisi halus saat mode berganti */
+    html { transition: background-color .4s ease, color .4s ease; }
+    body, #sidebar, #topbar, .panel-card, .stat-card, .product-card,
+    .cart-panel, .custom-table, .tx-card, .rwyt-stat-card, .laporan-card,
+    .filter-bar, .modal-content { transition: background .4s ease, border-color .4s ease, color .4s ease; }
+
+    /* Indikator mode di topbar */
+    #mode-indicator {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: .95rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      transition: all .4s ease;
+    }
+  </style>
+  <!-- jsPDF + AutoTable for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<!-- ═══ EXPORT GATE OVERLAY ═══ -->
+<div id="export-gate" class="hidden">
+  <div class="gate-card">
+    <div class="gate-icon-wrap">⚠️</div>
+    <div class="gate-title">Wajib Export Laporan Harian</div>
+    <div class="gate-desc">
+      Sudah lewat jam <strong style="color:#f59e0b;">06:00 pagi</strong> hari ini namun laporan CSV belum diexport.<br><br>
+      Export CSV terlebih dahulu untuk melanjutkan menggunakan aplikasi kasir.
+    </div>
+    <div class="gate-time-badge">
+      <i class="bi bi-clock-fill"></i>
+      <span id="gate-last-export-info">Belum pernah export hari ini</span>
+    </div>
+    <button class="gate-btn" onclick="gateExportPDF()">
+      <i class="bi bi-download"></i>
+      Export PDF Sekarang
+    </button>
+    <div class="gate-footer">
+      <i class="bi bi-shield-lock-fill me-1"></i>
+      Aplikasi terkunci sampai export laporan selesai
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="brand">
+    <div class="d-flex align-items-center justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <div class="bg-brand rounded-2 d-flex align-items-center justify-content-center" style="width:36px;height:36px;font-size:1.1rem;flex-shrink:0;">
+          <i class="bi bi-bag-check-fill"></i>
+        </div>
+        <div>
+          <div class="brand-name">KASIR</div>
+          <div class="brand-sub">Warkop Cemara</div>
+        </div>
+      </div>
+      <button id="closeSidebar" onclick="document.getElementById('sidebar').classList.remove('open')" style="background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;" onmouseover="this.style.background='rgba(255,94,107,.15)';this.style.color='#ff5e6b';this.style.borderColor='rgba(255,94,107,.3)';" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='var(--muted)';this.style.borderColor='var(--border)';">
+        <i class="bi bi-x" style="font-size:1.1rem;"></i>
+      </button>
+    </div>
+  </div>
+  <div class="py-1">
+    <a href="#" class="nav-link-side active" data-page="home"><i class="bi bi-house-door-fill"></i> Beranda</a>
+    <a href="#" class="nav-link-side" data-page="pesanan"><i class="bi bi-receipt-cutoff"></i> Pesanan</a>
+    <a href="#" class="nav-link-side" data-page="produk"><i class="bi bi-box-seam-fill"></i> Produk</a>
+    <a href="#" class="nav-link-side" data-page="belanja"><i class="bi bi-cart3"></i> Belanja</a>
+    <a href="#" class="nav-link-side" data-page="riwayat"><i class="bi bi-clock-history"></i> Riwayat Transaksi</a>
+    <a href="#" class="nav-link-side" data-page="settings"><i class="bi bi-gear-fill"></i> Pengaturan</a>
+  </div>
+  <div class="sidebar-footer">
+    <div style="font-size:.7rem;color:var(--muted);">v2.0 • Sistem Kasir</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main-content">
+  <div id="export-reminder-bar" class="hidden">
+    <div><i class="bi bi-check-circle-fill me-1" style="color:#00e5a0;"></i> CSV sudah diexport hari ini — <span id="reminder-bar-time" class="mono"></span></div>
+    <button onclick="document.getElementById('export-reminder-bar').classList.add('hidden')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;"><i class="bi bi-x"></i></button>
+  </div>
+  <div id="topbar" style="position:relative;">
+    <div class="topbar-left">
+      <button class="btn btn-sm d-md-none" id="toggleSidebar"
+        style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:34px;height:34px;padding:0;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="bi bi-list" style="font-size:1.1rem;"></i>
+      </button>
+      <div class="topbar-divider d-none d-md-block"></div>
+      <!-- Page name pill button -->
+      <button id="page-info-btn" onclick="togglePageInfo()"
+        style="display:flex;align-items:center;gap:.45rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:.82rem;font-weight:700;padding:.3rem .75rem;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .18s;flex-shrink:0;line-height:1;">
+        <i id="page-icon" class="bi bi-house-door-fill" style="font-size:.85rem;color:var(--brand);"></i>
+        <span id="page-title-label">Beranda</span>
+        <i class="bi bi-chevron-down" id="page-info-chevron" style="font-size:.6rem;color:var(--muted);transition:transform .22s ease;margin-left:.1rem;"></i>
+      </button>
+      <div class="topbar-divider"></div>
+      <span class="topbar-page-desc d-none d-lg-block" id="page-sub">Dashboard utama sistem kasir</span>
+    </div>
+    <div class="topbar-right">
+      <span id="mode-indicator"></span>
+      <div class="topbar-clock-wrap">
+        <i class="bi bi-clock" style="font-size:.7rem;color:var(--muted);"></i>
+        <span class="mono text-brand fw-bold" style="font-size:.78rem;letter-spacing:.3px;" id="clock"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE INFO OVERLAY DROPDOWN -->
+  <div id="page-info-panel" style="display:none;position:absolute;top:56px;left:0;right:0;z-index:1040;background:var(--surface);border-bottom:2px solid var(--brand);box-shadow:0 12px 40px rgba(0,0,0,.45);animation:fadeSlide .18s ease;">
+    <div style="max-width:860px;margin:0 auto;padding:1.25rem 1.5rem 1.35rem;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;">
+        <div id="page-info-content" style="font-size:.83rem;color:var(--text);line-height:1.8;flex:1;"></div>
+        <button onclick="closePageInfo()" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;" onmouseover="this.style.background='rgba(255,94,107,.15)';this.style.color='#ff5e6b';" onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.color='var(--muted)';">
+          <i class="bi bi-x" style="font-size:1rem;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-4">
+
+    <!-- ═══ PAGE: HOME ═══ -->
+    <div class="page active" id="page-home">
+
+      <!-- ── GREETING ── -->
+      <div class="home-banner mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <div class="home-greeting" id="home-greeting">Selamat Pagi ☀️</div>
+            <div class="home-sub">Warkop Cemara · <span id="home-date-str" class="mono"></span></div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm fw-bold" style="background:rgba(0,229,160,.15);color:#00e5a0;border:1px solid rgba(0,229,160,.3);border-radius:10px;" onclick="showPage('pesanan')">
+              <i class="bi bi-plus-circle me-1"></i>Pesanan Baru
+            </button>
+            <button class="btn btn-sm fw-bold" style="background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.25);border-radius:10px;" onclick="showPage('riwayat')">
+              <i class="bi bi-clock-history me-1"></i>Riwayat
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── AKSES CEPAT + TRANSAKSI TERBARU ── -->
+      <div class="row g-3 mb-5">
+
+        <!-- Quick Access: 4 tombol tanpa card wrapper -->
+        <div class="col-lg-4">
+          <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.65rem;padding-left:.1rem;">
+            <i class="bi bi-lightning-charge-fill me-1" style="color:var(--brand);"></i>Akses Cepat
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <button class="quick-btn w-100" onclick="showPage('pesanan')" style="--qc:#00e5a0;">
+                <i class="bi bi-receipt-cutoff" style="font-size:1.4rem;color:#00e5a0;"></i><span>Pesanan</span>
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="quick-btn w-100" onclick="showPage('belanja')" style="--qc:#ff5e6b;">
+                <i class="bi bi-cart3" style="font-size:1.4rem;color:#ff5e6b;"></i><span>Belanja</span>
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="quick-btn w-100" onclick="showPage('produk')" style="--qc:#a78bfa;">
+                <i class="bi bi-box-seam-fill" style="font-size:1.4rem;color:#a78bfa;"></i><span>Produk</span>
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="quick-btn w-100" onclick="showPage('riwayat')" style="--qc:#38bdf8;">
+                <i class="bi bi-clock-history" style="font-size:1.4rem;color:#38bdf8;"></i><span>Riwayat</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transaksi Terbaru -->
+        <div class="col-lg-8">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem;">
+            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">
+              <i class="bi bi-clock-history me-1" style="color:var(--brand);"></i>Transaksi Terbaru
+            </div>
+            <button onclick="showPage('riwayat')" style="background:none;border:none;color:var(--brand);font-size:.72rem;font-weight:700;cursor:pointer;padding:0;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+              Lihat Semua <i class="bi bi-arrow-right" style="font-size:.65rem;"></i>
+            </button>
+          </div>
+          <div id="home-recent-list" style="font-size:.85rem;">
+            <div class="text-center text-secondary py-5">
+              <i class="bi bi-inbox" style="font-size:2rem;opacity:.3;"></i>
+              <div class="mt-2" style="font-size:.82rem;">Belum ada transaksi.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DOKUMENTASI APLIKASI (BRD) ── -->
+      <!-- Separator -->
+      <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:2rem;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);white-space:nowrap;">
+          <i class="bi bi-file-earmark-text me-1"></i>Dokumentasi · BRD v2.0
+        </div>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+
+      <!-- 1. Ikhtisar -->
+      <div style="margin-bottom:2.5rem;">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem;">
+          <div style="background:var(--brand);width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-bag-check-fill" style="color:#0a0e13;font-size:.72rem;"></i>
+          </div>
+          <div>
+            <span style="font-size:.95rem;font-weight:800;color:var(--brand);">Kasir Warkop Cemara</span>
+            <span style="font-size:.68rem;color:var(--muted);margin-left:.5rem;">Point of Sale · Web-based · v2.0</span>
+          </div>
+        </div>
+        <p style="font-size:.84rem;color:var(--text);line-height:1.85;margin:0;padding-left:.1rem;">
+          Sistem kasir berbasis web yang dirancang khusus untuk operasional harian <strong>Warkop Cemara</strong>.
+          Berjalan sepenuhnya di browser — tanpa instalasi, tanpa server, tanpa biaya langganan.
+          Seluruh data (transaksi, produk, pengaturan) disimpan di <strong>localStorage</strong> sehingga tetap tersedia meski browser ditutup.
+        </p>
+      </div>
+
+      <!-- 2. Tujuan — inline list, no cards -->
+      <div style="margin-bottom:2.5rem;">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">
+          <div style="width:3px;height:16px;background:var(--brand);border-radius:2px;flex-shrink:0;"></div>
+          <span style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:var(--brand);">01 · Tujuan Aplikasi</span>
+        </div>
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <div style="display:flex;align-items:flex-start;gap:.65rem;">
+              <span style="font-size:1.3rem;line-height:1;margin-top:.1rem;">⚡</span>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.15rem;">Transaksi Cepat</div>
+                <div style="font-size:.72rem;color:var(--muted);line-height:1.5;">Proses pesanan tanpa antrian panjang.</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div style="display:flex;align-items:flex-start;gap:.65rem;">
+              <span style="font-size:1.3rem;line-height:1;margin-top:.1rem;">📒</span>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.15rem;">Catatan Akurat</div>
+                <div style="font-size:.72rem;color:var(--muted);line-height:1.5;">Rekam transaksi, hutang & pengeluaran.</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div style="display:flex;align-items:flex-start;gap:.65rem;">
+              <span style="font-size:1.3rem;line-height:1;margin-top:.1rem;">📊</span>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.15rem;">Laporan Harian</div>
+                <div style="font-size:.72rem;color:var(--muted);line-height:1.5;">Pantau omzet & hutang kapan pun.</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div style="display:flex;align-items:flex-start;gap:.65rem;">
+              <span style="font-size:1.3rem;line-height:1;margin-top:.1rem;">🔒</span>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.15rem;">Backup Aman</div>
+                <div style="font-size:.72rem;color:var(--muted);line-height:1.5;">Export CSV harian sebagai arsip.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Modul & Fitur — divider list, no nested cards -->
+      <div style="margin-bottom:2.5rem;">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">
+          <div style="width:3px;height:16px;background:#a78bfa;border-radius:2px;flex-shrink:0;"></div>
+          <span style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:#a78bfa;">02 · Modul & Fitur Utama</span>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <div style="display:flex;gap:1rem;align-items:flex-start;padding:.9rem 1.1rem;border-bottom:1px solid var(--border);">
+            <div style="background:rgba(0,229,160,.12);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🧾</div>
+            <div>
+              <div style="font-weight:800;font-size:.82rem;color:#00e5a0;margin-bottom:.18rem;">Pesanan <span style="font-size:.65rem;color:var(--muted);font-weight:500;">— Kasir Utama</span></div>
+              <div style="font-size:.74rem;color:var(--muted);line-height:1.6;">Pilih menu, keranjang, nama pelanggan, bayar Tunai/QR. Dukung pesanan custom & pencatatan hutang otomatis jika bayar kurang.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;align-items:flex-start;padding:.9rem 1.1rem;border-bottom:1px solid var(--border);">
+            <div style="background:rgba(167,139,250,.12);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">📦</div>
+            <div>
+              <div style="font-weight:800;font-size:.82rem;color:#a78bfa;margin-bottom:.18rem;">Produk <span style="font-size:.65rem;color:var(--muted);font-weight:500;">— Manajemen Katalog</span></div>
+              <div style="font-size:.74rem;color:var(--muted);line-height:1.6;">Tambah, edit, hapus produk kapan saja. 5 kategori, ikon emoji, pencarian & filter. Perubahan langsung aktif di halaman Pesanan.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;align-items:flex-start;padding:.9rem 1.1rem;border-bottom:1px solid var(--border);">
+            <div style="background:rgba(255,94,107,.12);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🛒</div>
+            <div>
+              <div style="font-weight:800;font-size:.82rem;color:#ff5e6b;margin-bottom:.18rem;">Belanja <span style="font-size:.65rem;color:var(--muted);font-weight:500;">— Pengeluaran Operasional</span></div>
+              <div style="font-size:.74rem;color:var(--muted);line-height:1.6;">Rekam pengeluaran harian (bahan baku, bumbu, dll). Masuk ke laporan sebagai tipe Belanja & diperhitungkan dalam omzet bersih.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;align-items:flex-start;padding:.9rem 1.1rem;">
+            <div style="background:rgba(56,189,248,.12);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">📊</div>
+            <div>
+              <div style="font-weight:800;font-size:.82rem;color:#38bdf8;margin-bottom:.18rem;">Riwayat <span style="font-size:.65rem;color:var(--muted);font-weight:500;">— Laporan & Arsip</span></div>
+              <div style="font-size:.74rem;color:var(--muted);line-height:1.6;">Semua transaksi + ringkasan (QR, tunai, hutang, omzet). Detail & pelunasan hutang langsung dari sini. Export CSV wajib tiap hari.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Alur Harian — compact numbered list -->
+      <div style="margin-bottom:2.5rem;">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">
+          <div style="width:3px;height:16px;background:#38bdf8;border-radius:2px;flex-shrink:0;"></div>
+          <span style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:#38bdf8;">03 · Alur Penggunaan Harian</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <div style="display:flex;align-items:flex-start;gap:.8rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#00e5a0;background:rgba(0,229,160,.12);padding:.2rem .45rem;border-radius:5px;flex-shrink:0;margin-top:.05rem;">01</span>
+            <span style="font-size:.78rem;color:var(--text);line-height:1.55;"><strong>Buka Aplikasi</strong> — Jika sudah lewat jam 06:00 dan belum export, aplikasi akan meminta export CSV dulu.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#00e5a0;background:rgba(0,229,160,.12);padding:.2rem .45rem;border-radius:5px;flex-shrink:0;margin-top:.05rem;">02</span>
+            <span style="font-size:.78rem;color:var(--text);line-height:1.55;"><strong>Layani Pelanggan</strong> — Buka <strong style="color:#00e5a0;">Pesanan</strong>, pilih menu, isi data bayar, klik Bayar. Ulangi untuk tiap pelanggan.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#00e5a0;background:rgba(0,229,160,.12);padding:.2rem .45rem;border-radius:5px;flex-shrink:0;margin-top:.05rem;">03</span>
+            <span style="font-size:.78rem;color:var(--text);line-height:1.55;"><strong>Catat Pengeluaran</strong> — Belanja bahan baku? Buka <strong style="color:#ff5e6b;">Belanja</strong> dan rekam setiap item pengeluaran.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#00e5a0;background:rgba(0,229,160,.12);padding:.2rem .45rem;border-radius:5px;flex-shrink:0;margin-top:.05rem;">04</span>
+            <span style="font-size:.78rem;color:var(--text);line-height:1.55;"><strong>Pantau Laporan</strong> — Cek omzet & hutang di <strong style="color:#38bdf8;">Riwayat</strong>. Lunasi hutang langsung dari halaman tersebut.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem;padding:.75rem 1rem;background:rgba(245,158,11,.04);">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#f59e0b;background:rgba(245,158,11,.18);padding:.2rem .45rem;border-radius:5px;flex-shrink:0;margin-top:.05rem;">05</span>
+            <span style="font-size:.78rem;color:var(--text);line-height:1.55;"><strong style="color:#f59e0b;">Export CSV Wajib</strong> — Sebelum tutup/esok pagi, export data dari Riwayat sebagai arsip eksternal permanen.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Kelebihan & Keterbatasan — dua kolom teks, tanpa border box -->
+      <div style="margin-bottom:2.5rem;">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">
+          <div style="width:3px;height:16px;background:#f59e0b;border-radius:2px;flex-shrink:0;"></div>
+          <span style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:#f59e0b;">04 · Kelebihan & Keterbatasan</span>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#00e5a0;margin-bottom:.6rem;"><i class="bi bi-check-circle-fill me-1"></i>Kelebihan</div>
+            <div style="font-size:.78rem;color:var(--text);line-height:2.1;">
+              <div>✅ Gratis, tidak perlu internet setelah dimuat</div>
+              <div>✅ Tanpa instalasi — langsung pakai di browser</div>
+              <div>✅ Data otomatis tersimpan di perangkat</div>
+              <div>✅ Responsif — HP, tablet, dan laptop</div>
+              <div>✅ Tema otomatis siang/malam + kustomisasi manual</div>
+              <div>✅ Sistem hutang & pelunasan terintegrasi</div>
+              <div>✅ Pesanan custom untuk menu di luar katalog</div>
+              <div>✅ Ringan & cepat — tanpa loading halaman</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#ff5e6b;margin-bottom:.6rem;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Keterbatasan</div>
+            <div style="font-size:.78rem;color:var(--text);line-height:2.1;">
+              <div>⚠️ Data hanya di 1 perangkat — tidak sinkron</div>
+              <div>⚠️ Tidak ada sistem login / akses kontrol</div>
+              <div>⚠️ Data hilang jika browser di-clear</div>
+              <div>⚠️ Tidak ada cetak struk ke printer</div>
+              <div>⚠️ Laporan tanpa grafik tren</div>
+              <div>⚠️ Tanpa manajemen stok / inventaris</div>
+              <div>⚠️ Export CSV satu-satunya backup eksternal</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Penyimpanan Data — subtle notice -->
+      <div style="border-top:1px solid var(--border);padding-top:1.25rem;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;">
+          <div style="width:3px;height:16px;background:#f59e0b;border-radius:2px;flex-shrink:0;"></div>
+          <span style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:#f59e0b;">05 · Kebijakan Penyimpanan Data</span>
+        </div>
+        <p style="font-size:.78rem;color:var(--muted);line-height:1.85;margin:0;">
+          Semua data disimpan di <strong style="color:var(--text);">localStorage</strong> browser perangkat ini — persisten meski browser ditutup, namun dapat hilang jika browser di-reset atau perangkat diganti.
+          <strong style="color:#f59e0b;"><i class="bi bi-shield-lock-fill me-1"></i>Lakukan Export CSV setiap hari</strong> setelah jam 06:00.
+          Simpan file CSV di Google Drive, WhatsApp, atau penyimpanan lain sebagai cadangan jangka panjang.
+        </p>
+      </div>
+
+    </div><!-- /page-home -->
+
+    <!-- ═══ PAGE: PESANAN ═══ -->
+    <div class="page" id="page-pesanan">
+      <div class="row g-3">
+        <div class="col-lg-7">
+          <div class="d-flex gap-2 mb-3 flex-wrap" id="cat-buttons-pesanan">
+            <button class="btn btn-sm cat-btn active" data-cat="semua">Semua</button>
+            <button class="btn btn-sm btn-outline-secondary cat-btn" data-cat="Spesial Indomie">🍜 Indomie</button>
+            <button class="btn btn-sm btn-outline-secondary cat-btn" data-cat="Makanan">🍽 Makanan</button>
+            <button class="btn btn-sm btn-outline-secondary cat-btn" data-cat="Cemilan">🧁 Cemilan</button>
+            <button class="btn btn-sm btn-outline-secondary cat-btn" data-cat="Spesial Bubur">🍲 Bubur</button>
+            <button class="btn btn-sm btn-outline-secondary cat-btn" data-cat="Minuman">☕ Minuman</button>
+          </div>
+          <div class="row g-2" id="pesanan-products"></div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="cart-panel">
+            <div class="p-3 border-bottom" style="border-color:var(--border)!important;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-bold" style="font-size:.9rem;"><i class="bi bi-cart3 me-2 text-brand"></i>Keranjang</div>
+                <button class="btn btn-xs btn-outline-danger py-0 px-2" style="font-size:.72rem;" onclick="clearCart('pesanan')">Kosongkan</button>
+              </div>
+              <!-- Custom order button -->
+              <button class="btn btn-sm w-100" style="background:rgba(167,139,250,.12);color:#a78bfa;border:1px dashed rgba(167,139,250,.4);font-size:.78rem;border-radius:8px;" onclick="openCustomItemModal()">
+                <i class="bi bi-plus-circle me-1"></i>+ Tambah Pesanan Custom
+              </button>
+            </div>
+            <div class="cart-items-scroll" id="pesanan-cart-items">
+              <div class="text-center text-secondary p-4" id="pesanan-cart-empty">
+                <i class="bi bi-cart-x" style="font-size:2.5rem;"></i>
+                <div class="mt-2" style="font-size:.85rem;">Keranjang masih kosong</div>
+              </div>
+            </div>
+            <div class="cart-footer">
+              <div class="mb-2">
+                <input type="text" id="pesanan-customer" class="form-control form-control-sm" placeholder="Nama pelanggan / No. meja" />
+              </div>
+              <div class="d-flex justify-content-between mb-1" style="font-size:.82rem;">
+                <span class="text-secondary">Total</span>
+                <span class="mono text-brand fw-bold" id="pesanan-total-val">Rp 0</span>
+              </div>
+              <div class="mb-2">
+                <select class="form-select form-select-sm" id="pesanan-payment-method">
+                  <option value="Tunai">💵 Tunai</option>
+                  <option value="QR">📱 QR</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <input type="number" id="pesanan-bayar" class="form-control form-control-sm" placeholder="Jumlah dibayar (0 = hutang penuh)" min="0" />
+              </div>
+              <div class="d-flex justify-content-between mb-1" style="font-size:.78rem;" id="pesanan-kembalian-row">
+                <span class="text-secondary">Kembalian / Hutang</span>
+                <span class="mono" id="pesanan-kembalian-val">-</span>
+              </div>
+              <button class="btn btn-brand w-100 fw-bold mt-2" onclick="checkoutPesanan()"><i class="bi bi-check2-circle me-1"></i>Bayar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: PRODUK (CRUD) ═══ -->
+    <div class="page" id="page-produk">
+      <div class="d-flex flex-wrap gap-2 mb-4 align-items-center">
+        <input type="text" id="produk-search" class="form-control form-control-sm w-auto flex-fill" placeholder="🔍  Cari produk..." oninput="renderProdukPage()" />
+        <select class="form-select form-select-sm w-auto" id="produk-filter-cat" onchange="renderProdukPage()">
+          <option value="">Semua Kategori</option>
+          <option>Spesial Indomie</option>
+          <option>Makanan</option>
+          <option>Cemilan</option>
+          <option>Spesial Bubur</option>
+          <option>Minuman</option>
+        </select>
+        <button class="btn btn-brand btn-sm fw-bold" onclick="openProdukModal()">
+          <i class="bi bi-plus-lg me-1"></i>Tambah Produk
+        </button>
+      </div>
+      <div class="row g-3" id="produk-grid"></div>
+    </div>
+
+    <!-- ═══ PAGE: BELANJA ═══ -->
+    <div class="page" id="page-belanja">
+      <div class="row g-3">
+        <div class="col-lg-7">
+          <div class="laporan-card mb-3">
+            <div class="fw-bold mb-3" style="font-size:.9rem;"><i class="bi bi-plus-circle me-2 text-brand"></i>Tambah Item Belanja</div>
+            <div class="row g-2">
+              <div class="col-8"><input type="text" id="belanja-item-name" class="form-control form-control-sm" placeholder="Nama item (misal: Telur 1 kg)" /></div>
+              <div class="col-4"><input type="number" id="belanja-item-price" class="form-control form-control-sm" placeholder="Harga" min="0" /></div>
+              <div class="col-12"><button class="btn btn-sm w-100 fw-bold" style="background:var(--danger);color:#fff;border:none;border-radius:9px;transition:all .18s;" onmouseover="this.style.background='#e04553';" onmouseout="this.style.background='var(--danger)';" onclick="addBelanjaItem()"><i class="bi bi-plus me-1"></i>Tambah ke Keranjang</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="cart-panel">
+            <div class="p-3 border-bottom" style="border-color:var(--border)!important;"><div class="fw-bold" style="font-size:.9rem;"><i class="bi bi-cart3 me-2 text-brand"></i>Keranjang Belanja</div></div>
+            <div class="cart-items-scroll" id="belanja-cart-items">
+              <div class="text-center text-secondary p-4" id="belanja-cart-empty"><i class="bi bi-cart-x" style="font-size:2.5rem;"></i><div class="mt-2" style="font-size:.85rem;">Belum ada item</div></div>
+            </div>
+            <div class="cart-footer">
+              <div class="mb-2"><input type="text" id="belanja-kasir-name" class="form-control form-control-sm" placeholder="Nama kasir yang belanja" /></div>
+              <div class="d-flex justify-content-between mb-3 fw-bold" style="font-size:.85rem;">
+                <span>Total Pengeluaran</span>
+                <span class="mono" style="color:var(--danger);" id="belanja-total-val">Rp 0</span>
+              </div>
+              <button class="btn w-100 fw-bold" style="background:var(--danger);color:#fff;border:none;border-radius:9px;transition:all .18s;" onmouseover="this.style.background='#e04553';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='var(--danger)';this.style.transform='none';" onclick="checkoutBelanja()"><i class="bi bi-bag-check me-1"></i>Catat Pengeluaran</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: RIWAYAT TRANSAKSI ═══ -->
+    <div class="page" id="page-riwayat">
+
+      <!-- Header + Action Buttons -->
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+          <div class="fw-bold" style="font-size:1rem;">Semua Transaksi</div>
+          <div id="rwyt-count-info" style="font-size:.75rem;color:var(--muted);">0 transaksi</div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-outline-danger btn-sm fw-bold" onclick="deleteAllTx()">
+            <i class="bi bi-trash me-1"></i>Hapus Semua
+          </button>
+          <button class="btn btn-brand btn-sm fw-bold" onclick="exportPDF()">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Row -->
+      <div class="row g-2 mb-4" id="rwyt-summary-row"></div>
+
+      <!-- Transaction Cards -->
+      <div id="riwayat-list" class="d-flex flex-column gap-3">
+        <div class="tx-card text-center text-secondary py-5">
+          <i class="bi bi-clock-history" style="font-size:2.5rem;opacity:.3;"></i>
+          <div class="mt-3" style="font-size:.88rem;">Belum ada transaksi.</div>
+        </div>
+      </div>
+
+      <div class="mt-3 text-center" style="font-size:.75rem;color:var(--muted);" id="rwyt-total-info"></div>
+    </div>
+
+    <!-- ═══ PAGE: SETTINGS ═══ -->
+    <div class="page" id="page-settings">
+
+      <!-- Tema Warna -->
+      <div class="panel-card mb-3">
+        <div class="panel-header d-flex align-items-center gap-2">
+          <i class="bi bi-palette-fill text-brand"></i> Tema Warna
+        </div>
+        <div class="panel-body">
+          <div class="row g-2" id="theme-options">
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100 active" data-theme="default" onclick="applyTheme(this)" style="--tc:#00e5a0;">
+                <span class="theme-dot" style="background:#00e5a0;"></span>
+                <span>Hijau Toska <span class="badge-default-tag">(Default)</span></span>
+              </button>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100" data-theme="blue" onclick="applyTheme(this)" style="--tc:#38bdf8;">
+                <span class="theme-dot" style="background:#38bdf8;"></span>
+                <span>Biru Langit</span>
+              </button>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100" data-theme="purple" onclick="applyTheme(this)" style="--tc:#a78bfa;">
+                <span class="theme-dot" style="background:#a78bfa;"></span>
+                <span>Ungu Lavender</span>
+              </button>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100" data-theme="orange" onclick="applyTheme(this)" style="--tc:#fb923c;">
+                <span class="theme-dot" style="background:#fb923c;"></span>
+                <span>Oranye Hangat</span>
+              </button>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100" data-theme="rose" onclick="applyTheme(this)" style="--tc:#fb7185;">
+                <span class="theme-dot" style="background:#fb7185;"></span>
+                <span>Merah Mawar</span>
+              </button>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100" data-theme="yellow" onclick="applyTheme(this)" style="--tc:#fbbf24;">
+                <span class="theme-dot" style="background:#fbbf24;"></span>
+                <span>Kuning Emas</span>
+              </button>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100" data-theme="cyan" onclick="applyTheme(this)" style="--tc:#22d3ee;">
+                <span class="theme-dot" style="background:#22d3ee;"></span>
+                <span>Cyan Neon</span>
+              </button>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+              <button class="theme-btn w-100" data-theme="lime" onclick="applyTheme(this)" style="--tc:#a3e635;">
+                <span class="theme-dot" style="background:#a3e635;"></span>
+                <span>Hijau Lime</span>
+              </button>
+            </div>
+          </div>
+          <div class="mt-3 p-3" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:.8rem;">
+            <span style="color:var(--muted);">Preview warna aktif: </span>
+            <span class="fw-bold text-brand">■ Teks brand</span>
+            <span class="mx-2">·</span>
+            <button class="btn btn-brand btn-sm py-0 px-2" style="font-size:.75rem;">Tombol Brand</button>
+            <span class="mx-2">·</span>
+            <span class="mono text-brand">Rp 12.000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Font -->
+      <div class="panel-card mb-3">
+        <div class="panel-header d-flex align-items-center gap-2">
+          <i class="bi bi-type text-brand"></i> Jenis Font
+        </div>
+        <div class="panel-body">
+          <div class="row g-2" id="font-options">
+            <div class="col-12 col-md-6 col-lg-4">
+              <button class="font-btn w-100 active" data-font="Plus Jakarta Sans" onclick="applyFont(this)">
+                <div class="font-btn-preview" style="font-family:'Plus Jakarta Sans',sans-serif;">Aa Bb Cc</div>
+                <div class="font-btn-name">Plus Jakarta Sans <span class="badge ms-1" style="background:rgba(0,229,160,.15);color:#00e5a0;font-size:.6rem;">Default</span></div>
+              </button>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <button class="font-btn w-100" data-font="Inter" onclick="applyFont(this)">
+                <div class="font-btn-preview" style="font-family:'Inter',sans-serif;">Aa Bb Cc</div>
+                <div class="font-btn-name">Inter</div>
+              </button>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <button class="font-btn w-100" data-font="Poppins" onclick="applyFont(this)">
+                <div class="font-btn-preview" style="font-family:'Poppins',sans-serif;">Aa Bb Cc</div>
+                <div class="font-btn-name">Poppins</div>
+              </button>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <button class="font-btn w-100" data-font="Nunito" onclick="applyFont(this)">
+                <div class="font-btn-preview" style="font-family:'Nunito',sans-serif;">Aa Bb Cc</div>
+                <div class="font-btn-name">Nunito</div>
+              </button>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <button class="font-btn w-100" data-font="Roboto" onclick="applyFont(this)">
+                <div class="font-btn-preview" style="font-family:'Roboto',sans-serif;">Aa Bb Cc</div>
+                <div class="font-btn-name">Roboto</div>
+              </button>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <button class="font-btn w-100" data-font="DM Sans" onclick="applyFont(this)">
+                <div class="font-btn-preview" style="font-family:'DM Sans',sans-serif;">Aa Bb Cc</div>
+                <div class="font-btn-name">DM Sans</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ukuran Teks -->
+      <div class="panel-card mb-3">
+        <div class="panel-header d-flex align-items-center gap-2">
+          <i class="bi bi-text-size text-brand"></i> Ukuran Teks
+        </div>
+        <div class="panel-body">
+          <div class="d-flex gap-2 flex-wrap" id="size-options">
+            <button class="size-btn" data-scale="0.88" onclick="applySize(this)">
+              <span style="font-size:.75rem;">Aa</span>
+              <span>Kecil</span>
+            </button>
+            <button class="size-btn active" data-scale="1" onclick="applySize(this)">
+              <span style="font-size:.9rem;">Aa</span>
+              <span>Normal <small>(Default)</small></span>
+            </button>
+            <button class="size-btn" data-scale="1.1" onclick="applySize(this)">
+              <span style="font-size:1rem;">Aa</span>
+              <span>Sedang</span>
+            </button>
+            <button class="size-btn" data-scale="1.2" onclick="applySize(this)">
+              <span style="font-size:1.1rem;">Aa</span>
+              <span>Besar</span>
+            </button>
+            <button class="size-btn" data-scale="1.35" onclick="applySize(this)">
+              <span style="font-size:1.25rem;">Aa</span>
+              <span>Sangat Besar</span>
+            </button>
+          </div>
+          <div class="mt-3 p-3" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;">
+            <div id="size-preview" style="line-height:1.6;">
+              <div class="fw-bold mb-1">Preview Teks Normal</div>
+              <div style="font-size:.85em;color:var(--muted);">Ini contoh teks biasa pada aplikasi kasir Warkop Cemara.</div>
+              <div class="mono mt-1" style="color:var(--brand);">Rp 12.000 · #TRX-001</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reset -->
+      <div class="panel-card mb-3">
+        <div class="panel-header d-flex align-items-center gap-2">
+          <i class="bi bi-arrow-counterclockwise" style="color:#ff5e6b;"></i> Reset & Data
+        </div>
+        <div class="panel-body d-flex flex-wrap gap-2">
+          <button class="btn btn-sm fw-bold" style="background:rgba(0,229,160,.12);color:#00e5a0;border-radius:8px;" onclick="resetTampilan()">
+            <i class="bi bi-palette me-1"></i>Reset Tampilan ke Default
+          </button>
+          <button class="btn btn-outline-danger btn-sm fw-bold" onclick="deleteAllTx()">
+            <i class="bi bi-trash me-1"></i>Reset Semua Data Transaksi
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /page-settings -->
+
+  </div>
+</div><!-- /main-content -->
+
+<!-- ═══ FOOTER ═══ -->
+<footer id="app-footer" style="margin-left:var(--sidebar-w);background:var(--surface);border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center;">
+  <div style="font-size:1.5rem;font-weight:800;color:var(--text);letter-spacing:-.3px;line-height:1.4;">
+    Dibuat dengan penuh <span style="color:#ff5e6b;">❤️</span> cinta dan <span style="color:#a78bfa;">💜</span> kasih sayang
+  </div>
+  <div style="font-size:1.15rem;font-weight:700;color:var(--brand);margin-top:.5rem;letter-spacing:.5px;">
+    by <span style="font-style:italic;">Ilham Sasuke</span> ✨
+  </div>
+  <div style="font-size:.72rem;color:var(--muted);margin-top:.75rem;letter-spacing:.5px;">
+    Kasir Warkop Cemara v2.0 · Semua hak cipta dilindungi cinta
+  </div>
+</footer>
+
+<style>
+  @media (max-width:767px) { #app-footer { margin-left: 0 !important; } }
+
+  /* Theme buttons */
+  .theme-btn {
+    display: flex; align-items: center; gap: .6rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; padding: .6rem .85rem;
+    color: var(--text); font-size: .8rem; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+    text-align: left;
+  }
+  .theme-btn:hover { border-color: var(--tc, var(--brand)); background: rgba(255,255,255,.04); }
+  .theme-btn.active { border-color: var(--tc, var(--brand)); background: rgba(255,255,255,.05); box-shadow: 0 0 0 2px var(--tc, var(--brand)) inset; }
+  .theme-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Font buttons */
+  .font-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; padding: .75rem 1rem;
+    color: var(--text); cursor: pointer; transition: all .15s;
+    text-align: left;
+  }
+  .font-btn:hover { border-color: var(--brand); }
+  .font-btn.active { border-color: var(--brand); background: rgba(0,229,160,.06); }
+  .font-btn-preview { font-size: 1.4rem; font-weight: 700; margin-bottom: .25rem; color: var(--text); line-height: 1; }
+  .font-btn-name { font-size: .75rem; color: var(--muted); font-weight: 600; }
+
+  /* Size buttons */
+  .size-btn {
+    display: flex; flex-direction: column; align-items: center; gap: .3rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; padding: .75rem 1.1rem;
+    color: var(--text); cursor: pointer; transition: all .15s;
+    font-weight: 600; min-width: 72px;
+  }
+  .size-btn:hover { border-color: var(--brand); }
+  .size-btn.active { border-color: var(--brand); background: rgba(0,229,160,.06); color: var(--brand); }
+  .size-btn small { font-size: .6rem; color: var(--muted); font-weight: 500; }
+</style>
+
+<!-- ═══ MODAL: Sukses Transaksi ═══ -->
+<div class="modal fade" id="successModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-check-circle-fill text-brand me-2"></i>Transaksi Dicatat</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="success-modal-body"></div>
+      <div class="modal-footer"><button type="button" class="btn btn-brand" data-bs-dismiss="modal">Tutup</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Produk CRUD ═══ -->
+<div class="modal fade" id="produkModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="produkModalTitle"><i class="bi bi-box-seam me-2 text-brand"></i>Tambah Produk</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="produk-edit-idx" value="" />
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Nama Produk</label>
+          <input type="text" id="produk-form-name" class="form-control form-control-sm" placeholder="Contoh: Indomie Spesial" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Kategori</label>
+          <select id="produk-form-cat" class="form-select form-select-sm">
+            <option>Spesial Indomie</option>
+            <option>Makanan</option>
+            <option>Cemilan</option>
+            <option>Spesial Bubur</option>
+            <option>Minuman</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Harga</label>
+          <input type="number" id="produk-form-price" class="form-control form-control-sm" placeholder="Contoh: 12000" min="0" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Icon (emoji)</label>
+          <input type="text" id="produk-form-icon" class="form-control form-control-sm" placeholder="🍜" maxlength="4" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-brand btn-sm fw-bold" onclick="saveProduk()">Simpan Produk</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Custom Item Pesanan ═══ -->
+<div class="modal fade" id="customItemModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-pencil-square me-2" style="color:#a78bfa;"></i>Pesanan Custom</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-secondary" style="font-size:.82rem;">Tambahkan item pesanan yang tidak ada di menu, misal racikan khusus atau request pelanggan.</p>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Nama Item Custom</label>
+          <input type="text" id="custom-item-name" class="form-control form-control-sm" placeholder="Contoh: Indomie + Telor + Sosis" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Harga</label>
+          <input type="number" id="custom-item-price" class="form-control form-control-sm" placeholder="Masukkan harga" min="0" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Catatan (opsional)</label>
+          <input type="text" id="custom-item-note" class="form-control form-control-sm" placeholder="Misal: Pedas level 2, tanpa bawang..." />
+        </div>
+        <div class="mb-0">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Jumlah</label>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary px-3" onclick="changeCustomQty(-1)">−</button>
+            <span id="custom-item-qty-display" class="mono fw-bold" style="font-size:1rem;width:30px;text-align:center;">1</span>
+            <button class="btn btn-sm btn-outline-secondary px-3" onclick="changeCustomQty(1)">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-sm fw-bold" style="background:#a78bfa;color:#0a0e13;" onclick="addCustomItemToCart()">
+          <i class="bi bi-plus-circle me-1"></i>Tambah ke Keranjang
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Detail Transaksi Riwayat ═══ -->
+<div class="modal fade" id="txDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-receipt me-2 text-brand"></i>Detail Transaksi</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="tx-detail-body"></div>
+      <div class="modal-footer"><button type="button" class="btn btn-brand btn-sm" data-bs-dismiss="modal">Tutup</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Bayar Hutang ═══ -->
+<div class="modal fade" id="bayarHutangModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-cash-coin me-2" style="color:var(--warn);"></i>Bayar Hutang</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="bayar-hutang-info" class="mb-3" style="font-size:.85rem;"></div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Jumlah Dibayar</label>
+          <input type="number" id="bayar-hutang-amount" class="form-control form-control-sm" placeholder="Masukkan jumlah pembayaran" min="0" oninput="updateBayarHutangInfo()" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.82rem;font-weight:600;">Metode Pembayaran</label>
+          <div class="d-flex gap-2">
+            <button type="button" id="bayar-method-tunai" class="btn btn-sm flex-fill fw-bold method-btn-active" style="border-radius:8px;" onclick="selectBayarMethod('Tunai')">
+              <i class="bi bi-cash me-1"></i>💵 Tunai
+            </button>
+            <button type="button" id="bayar-method-qr" class="btn btn-sm flex-fill fw-bold method-btn-inactive" style="border-radius:8px;" onclick="selectBayarMethod('QR')">
+              <i class="bi bi-qr-code me-1"></i>📱 QR
+            </button>
+          </div>
+        </div>
+        <div id="bayar-hutang-result" style="font-size:.82rem;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-brand btn-sm fw-bold" onclick="konfirmasiBayarHutang()">
+          <i class="bi bi-check2-circle me-1"></i>Konfirmasi Bayar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+  <div id="toast" class="toast align-items-center border-0 text-bg-success" role="alert">
+    <div class="d-flex">
+      <div class="toast-body" id="toast-msg">✅ Berhasil!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+let PRODUCTS = [
+  // ── Spesial Indomie ──
+  { name:'Indomie Goreng',                cat:'Spesial Indomie', price:8000,  icon:'🍜' },
+  { name:'Indomie + Telur',               cat:'Spesial Indomie', price:12000, icon:'🍜' },
+  { name:'Indomie Double',                cat:'Spesial Indomie', price:14000, icon:'🍜' },
+  { name:'Indomie Double + Telur',        cat:'Spesial Indomie', price:16000, icon:'🍜' },
+  { name:'Indomie Bakso',                 cat:'Spesial Indomie', price:12000, icon:'🍜' },
+  { name:'Indomie Sosis',                 cat:'Spesial Indomie', price:12000, icon:'🍜' },
+  { name:'Indomie Telur + Bakso + Sosis', cat:'Spesial Indomie', price:17000, icon:'🍜' },
+
+  // ── Makanan ──
+  { name:'Nasi Putih',                        cat:'Makanan', price:5000,  icon:'🍚' },
+  { name:'Telur Dadar / Ceplok / Orak Arik',  cat:'Makanan', price:5000,  icon:'🍳' },
+  { name:'Nasi Telur Dadar / Ceplok / Orak Arik', cat:'Makanan', price:10000, icon:'🍳' },
+  { name:'Mie Tek Tek (Goreng)',               cat:'Makanan', price:15000, icon:'🍝' },
+  { name:'Mie Dok Dok (Kuah)',                 cat:'Makanan', price:15000, icon:'🍝' },
+  { name:'Magelangan',                         cat:'Makanan', price:16000, icon:'🍛' },
+  { name:'Roti Bakar',                         cat:'Makanan', price:10000, icon:'🍞' },
+
+  // ── Cemilan ──
+  { name:'Makaroni',           cat:'Cemilan', price:2000,  icon:'🧆' },
+  { name:'Kentang Goreng',     cat:'Cemilan', price:12000, icon:'🍟' },
+  { name:'Telur 1/2 Matang',   cat:'Cemilan', price:6000,  icon:'🥚' },
+  { name:'Omelet',             cat:'Cemilan', price:13000, icon:'🍳' },
+
+  // ── Spesial Bubur ──
+  { name:'Bubur Ayam',              cat:'Spesial Bubur', price:12000, icon:'🍲' },
+  { name:'Bubur Ayam + Telur Rebus',cat:'Spesial Bubur', price:14000, icon:'🍲' },
+  { name:'Bubur Kacang Ijo',        cat:'Spesial Bubur', price:8000,  icon:'🍵' },
+  { name:'Bubur Kacang Ijo + Susu', cat:'Spesial Bubur', price:10000, icon:'🍵' },
+  { name:'Bubur Ketan Hitam',       cat:'Spesial Bubur', price:8000,  icon:'🍡' },
+  { name:'Roti Tawar',              cat:'Spesial Bubur', price:2000,  icon:'🍞' },
+
+  // ── Minuman ──
+  { name:'Es Batu',                cat:'Minuman', price:2000,  icon:'🧊' },
+  { name:'Es Tawar',               cat:'Minuman', price:2000,  icon:'🥤' },
+  { name:'Es Teh Tawar',           cat:'Minuman', price:2000,  icon:'🧋' },
+  { name:'Es Teh Manis',           cat:'Minuman', price:5000,  icon:'🧋' },
+  { name:'Teh Manis Panas',        cat:'Minuman', price:5000,  icon:'🍵' },
+  { name:'Kopi Hitam',             cat:'Minuman', price:5000,  icon:'☕' },
+  { name:'Good Day Biasa',         cat:'Minuman', price:5000,  icon:'☕' },
+  { name:'Good Day Cappucino',     cat:'Minuman', price:7000,  icon:'☕' },
+  { name:'Good Day Freeze',        cat:'Minuman', price:7000,  icon:'🧊' },
+  { name:'Kopi Luwak',             cat:'Minuman', price:5000,  icon:'☕' },
+  { name:'Kopi ABC',               cat:'Minuman', price:5000,  icon:'☕' },
+  { name:'Kopi Gadjah',            cat:'Minuman', price:5000,  icon:'☕' },
+  { name:'Indocafe',               cat:'Minuman', price:5000,  icon:'☕' },
+  { name:'Toracafe',               cat:'Minuman', price:6000,  icon:'☕' },
+  { name:'Tora Susu',              cat:'Minuman', price:6000,  icon:'🥛' },
+  { name:'Torabika Creamy Latte',  cat:'Minuman', price:7000,  icon:'☕' },
+  { name:'Nutrisari Semua Varian', cat:'Minuman', price:5000,  icon:'🍊' },
+  { name:'Pop Ice',                cat:'Minuman', price:7000,  icon:'🧊' },
+  { name:'Beng-Beng',              cat:'Minuman', price:7000,  icon:'🍫' },
+  { name:'Chocolatos',             cat:'Minuman', price:7000,  icon:'🍫' },
+  { name:'Teh Tarik',              cat:'Minuman', price:7000,  icon:'🍵' },
+  { name:'Dancow',                 cat:'Minuman', price:8000,  icon:'🥛' },
+  { name:'Energen',                cat:'Minuman', price:7000,  icon:'🥛' },
+  { name:'Hilo',                   cat:'Minuman', price:7000,  icon:'🥛' },
+  { name:'Milo',                   cat:'Minuman', price:7000,  icon:'🥛' },
+  { name:'Ovaltine',               cat:'Minuman', price:7000,  icon:'🥛' },
+  { name:'Soda Gembira',           cat:'Minuman', price:12000, icon:'🥤' },
+  { name:'Soda Susu',              cat:'Minuman', price:12000, icon:'🥤' },
+  { name:'Adem Sari',              cat:'Minuman', price:7000,  icon:'🍋' },
+  { name:'Jeruk Peras',            cat:'Minuman', price:7000,  icon:'🍊' },
+];
+
+let transactions = [];
+let pesananCart  = [];
+let belanjaCart  = [];
+let txCounter    = 1;
+let customItemQty = 1;
+
+// ═══════════════════════════════════════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ═══════════════════════════════════════════════════════════
+const LS_TX       = 'kasir_transactions';
+const LS_COUNTER  = 'kasir_txcounter';
+const LS_PRODUCTS = 'kasir_products';
+
+function saveData() {
+  try {
+    localStorage.setItem(LS_TX,       JSON.stringify(transactions));
+    localStorage.setItem(LS_COUNTER,  txCounter);
+    localStorage.setItem(LS_PRODUCTS, JSON.stringify(PRODUCTS));
+  } catch(e) { console.warn('localStorage save failed:', e); }
+}
+
+function loadData() {
+  try {
+    const tx = localStorage.getItem(LS_TX);
+    if (tx) transactions = JSON.parse(tx);
+    const ctr = localStorage.getItem(LS_COUNTER);
+    if (ctr) txCounter = parseInt(ctr) || 1;
+    const prod = localStorage.getItem(LS_PRODUCTS);
+    if (prod) PRODUCTS = JSON.parse(prod);
+  } catch(e) { console.warn('localStorage load failed:', e); }
+}
+
+// Load data immediately
+loadData();
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function fmt(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+function nowStr() {
+  const d = new Date();
+  return d.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' +
+         d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+}
+function todayISO() { return new Date().toISOString().slice(0,10); }
+function showToast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.className = 'toast align-items-center border-0 text-bg-' + type;
+  document.getElementById('toast-msg').textContent = msg;
+  new bootstrap.Toast(el,{delay:3000}).show();
+}
+function statusBadge(s) {
+  const m = { lunas:'badge-success-soft', sebagian:'badge-warning-soft', hutang:'badge-danger-soft', pengeluaran:'badge-danger-soft' };
+  return m[s] || 'badge-info-soft';
+}
+function statusLabel(s) {
+  const m = { lunas:'✅ Lunas', sebagian:'⚠️ Sebagian', hutang:'❌ Hutang', pengeluaran:'🛒 Pengeluaran' };
+  return m[s] || s;
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+const pageMeta = {
+  home:    'Dashboard utama sistem kasir',
+  pesanan: 'Catat & kelola pesanan pelanggan',
+  produk:  'Manajemen katalog produk',
+  belanja: 'Catat pengeluaran operasional',
+  riwayat: 'Seluruh catatan transaksi',
+  settings:'Konfigurasi tampilan aplikasi',
+};
+
+const pageTitles = {
+  home:    'Beranda',
+  pesanan: 'Pesanan',
+  produk:  'Produk',
+  belanja: 'Belanja',
+  riwayat: 'Riwayat',
+  settings:'Pengaturan',
+};
+
+const pageIcons = {
+  home:    'bi-house-door-fill',
+  pesanan: 'bi-receipt-cutoff',
+  produk:  'bi-box-seam-fill',
+  belanja: 'bi-cart3',
+  riwayat: 'bi-clock-history',
+  settings:'bi-gear-fill',
+};
+
+const pageDetail = {
+  home: `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><i class="bi bi-house-door-fill" style="color:var(--brand);"></i><strong style="color:var(--brand);">Beranda</strong><span style="font-size:.7rem;color:var(--muted);margin-left:.3rem;">— Dashboard Utama</span></div>Halaman utama yang menampilkan <strong>ringkasan aktivitas hari ini</strong>: sapaan otomatis berdasarkan waktu, tombol akses cepat ke semua modul, dan daftar transaksi terbaru. Scroll ke bawah untuk membaca dokumen lengkap aplikasi (BRD).`,
+  pesanan: `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><i class="bi bi-receipt-cutoff" style="color:#00e5a0;"></i><strong style="color:#00e5a0;">Pesanan</strong><span style="font-size:.7rem;color:var(--muted);margin-left:.3rem;">— Modul Kasir Utama</span></div>Pilih menu dari katalog (filter per kategori), masukkan ke keranjang, isi nama pelanggan/meja, pilih <strong>Tunai</strong> atau <strong>QR</strong>, lalu masukkan nominal bayar. Jika bayar = 0 atau kurang dari total → otomatis tercatat sebagai <strong style="color:#f59e0b;">hutang</strong>. Gunakan tombol <strong style="color:#a78bfa;">+ Pesanan Custom</strong> untuk menu di luar katalog.`,
+  produk: `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><i class="bi bi-box-seam-fill" style="color:#a78bfa;"></i><strong style="color:#a78bfa;">Produk</strong><span style="font-size:.7rem;color:var(--muted);margin-left:.3rem;">— Manajemen Katalog Menu</span></div>Kelola seluruh daftar menu: <strong>tambah, edit, hapus</strong> produk kapan saja. Mendukung 5 kategori (<em>Indomie, Makanan, Cemilan, Bubur, Minuman</em>), ikon emoji, serta pencarian & filter kategori. Setiap perubahan <strong>tersimpan otomatis</strong> ke localStorage dan langsung aktif di halaman Pesanan.`,
+  belanja: `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><i class="bi bi-cart3" style="color:#ff5e6b;"></i><strong style="color:#ff5e6b;">Belanja</strong><span style="font-size:.7rem;color:var(--muted);margin-left:.3rem;">— Catat Pengeluaran Operasional</span></div>Rekam pengeluaran harian seperti belanja bahan baku, bumbu, dan keperluan warung. Tambahkan item + harga ke keranjang, isi nama kasir, lalu <strong>Catat Pengeluaran</strong>. Data ini masuk ke Riwayat sebagai tipe <em>Belanja</em> dan ikut dihitung dalam laporan <strong style="color:#00e5a0;">omzet bersih</strong>.`,
+  riwayat: `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><i class="bi bi-clock-history" style="color:#38bdf8;"></i><strong style="color:#38bdf8;">Riwayat Transaksi</strong><span style="font-size:.7rem;color:var(--muted);margin-left:.3rem;">— Laporan & Arsip</span></div>Lihat seluruh transaksi dengan kartu ringkasan: total QR, tunai, hutang, pengeluaran, dan <strong>omzet bersih</strong>. Setiap transaksi bisa dilihat detailnya. Hutang bisa <strong>dilunasi langsung</strong> dari sini. Gunakan <strong>Export CSV</strong> setiap hari setelah jam 06:00 sebagai backup eksternal wajib.`,
+  settings: `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><i class="bi bi-gear-fill" style="color:var(--muted);"></i><strong>Pengaturan</strong><span style="font-size:.7rem;color:var(--muted);margin-left:.3rem;">— Konfigurasi Tampilan</span></div>Ubah <strong>tema warna</strong>, <strong>jenis font</strong>, dan <strong>ukuran teks</strong> sesuai preferensi — semua tersimpan otomatis. Di bagian bawah tersedia opsi <strong style="color:#ff5e6b;">reset tampilan</strong> ke default dan <strong style="color:#ff5e6b;">reset semua data transaksi</strong>. Gunakan dengan hati-hati karena tidak bisa dibatalkan.`,
+};
+
+let pageInfoOpen = false;
+let currentPageId = 'home';
+
+function togglePageInfo() {
+  pageInfoOpen = !pageInfoOpen;
+  const panel   = document.getElementById('page-info-panel');
+  const chevron = document.getElementById('page-info-chevron');
+  const btn     = document.getElementById('page-info-btn');
+  panel.style.display = pageInfoOpen ? 'block' : 'none';
+  chevron.style.transform = pageInfoOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  btn.style.borderColor   = pageInfoOpen ? 'var(--brand)' : 'var(--border)';
+  btn.style.color         = pageInfoOpen ? 'var(--brand)'  : 'var(--text)';
+  if (pageInfoOpen) {
+    document.getElementById('page-info-content').innerHTML = pageDetail[currentPageId] || '';
+  }
+}
+
+function closePageInfo() {
+  pageInfoOpen = false;
+  document.getElementById('page-info-panel').style.display = 'none';
+  const chevron = document.getElementById('page-info-chevron');
+  const btn     = document.getElementById('page-info-btn');
+  if (chevron) chevron.style.transform = 'rotate(0deg)';
+  if (btn)     { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text)'; }
+}
+
+function navigateTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link-side').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+  document.getElementById('page-sub').textContent = pageMeta[pageId];
+  document.getElementById('sidebar').classList.remove('open');
+  currentPageId = pageId;
+  // Update tombol nama halaman di topbar
+  const titleEl = document.getElementById('page-title-label');
+  const iconEl  = document.getElementById('page-icon');
+  if (titleEl) titleEl.textContent = pageTitles[pageId] || pageId;
+  if (iconEl)  { iconEl.className = 'bi ' + (pageIcons[pageId] || 'bi-circle'); iconEl.style.color = 'var(--brand)'; }
+  // Refresh panel content jika sedang terbuka
+  if (pageInfoOpen) {
+    document.getElementById('page-info-content').innerHTML = pageDetail[pageId] || '';
+  }
+  if (pageId === 'riwayat') renderRiwayat();
+  if (pageId === 'home') updateHome();
+}
+const showPage = navigateTo;
+
+document.querySelectorAll('[data-page]').forEach(el => {
+  el.addEventListener('click', e => { e.preventDefault(); navigateTo(el.dataset.page); });
+});
+document.getElementById('toggleSidebar').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// ═══════════════════════════════════════════════════════════
+// AUTO TEMA & SAPAAN BERDASARKAN WAKTU
+// ═══════════════════════════════════════════════════════════
+function applyTimedMode() {
+  const h = new Date().getHours();
+  const isDay = h >= 9 && h < 15;
+  const html  = document.documentElement;
+  const currentMode = html.getAttribute('data-bs-theme');
+  const targetMode  = isDay ? 'light' : 'dark';
+
+  if (currentMode !== targetMode) {
+    html.setAttribute('data-bs-theme', targetMode);
+  }
+
+  // Update indikator mode di topbar
+  const ind = document.getElementById('mode-indicator');
+  if (ind) {
+    if (isDay) {
+      ind.innerHTML = '☀️';
+      ind.style.background = 'rgba(245,158,11,.12)';
+      ind.style.borderColor = 'rgba(245,158,11,.28)';
+    } else {
+      ind.innerHTML = '🌙';
+      ind.style.background = 'rgba(56,189,248,.1)';
+      ind.style.borderColor = 'rgba(56,189,248,.22)';
+    }
+  }
+
+  // Perbarui sapaan di beranda jika sedang tampil
+  updateHome();
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  // Cek pergantian mode setiap menit (saat detik = 0)
+  if (now.getSeconds() === 0) applyTimedMode();
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// ═══════════════════════════════════════════════════════════
+// PESANAN
+// ═══════════════════════════════════════════════════════════
+function renderPesananProducts(cat='semua') {
+  const list = cat === 'semua' ? PRODUCTS : PRODUCTS.filter(p => p.cat === cat);
+  document.getElementById('pesanan-products').innerHTML = list.map(p => `
+    <div class="col-6 col-md-4">
+      <div class="product-card" onclick="addToCart('pesanan','${escAttr(p.name)}','${p.icon}',${p.price})">
+        <div class="product-body">
+          <div class="product-category">${p.cat}</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-price">${fmt(p.price)}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.querySelectorAll('#cat-buttons-pesanan .cat-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#cat-buttons-pesanan .cat-btn').forEach(b => {
+      b.classList.remove('active'); b.classList.add('btn-outline-secondary');
+    });
+    this.classList.add('active'); this.classList.remove('btn-outline-secondary');
+    renderPesananProducts(this.dataset.cat);
+  });
+});
+
+document.getElementById('pesanan-bayar').addEventListener('input', updateKembalian);
+
+function updateKembalian() {
+  const total = getPesananTotal();
+  const bayar = parseInt(document.getElementById('pesanan-bayar').value) || 0;
+  const el = document.getElementById('pesanan-kembalian-val');
+  if (bayar === 0) { el.textContent = 'Hutang: ' + fmt(total); el.style.color = 'var(--danger)'; }
+  else if (bayar >= total) { el.textContent = 'Kembalian: ' + fmt(bayar-total); el.style.color = '#00e5a0'; }
+  else { el.textContent = 'Kurang: ' + fmt(total-bayar); el.style.color = 'var(--warn)'; }
+}
+
+function getPesananTotal() { return pesananCart.reduce((s,i) => s + i.price * i.qty, 0); }
+
+// ═══════════════════════════════════════════════════════════
+// CUSTOM ITEM PESANAN
+// ═══════════════════════════════════════════════════════════
+function openCustomItemModal() {
+  customItemQty = 1;
+  document.getElementById('custom-item-qty-display').textContent = 1;
+  document.getElementById('custom-item-name').value = '';
+  document.getElementById('custom-item-price').value = '';
+  document.getElementById('custom-item-note').value = '';
+  new bootstrap.Modal(document.getElementById('customItemModal')).show();
+}
+
+function changeCustomQty(delta) {
+  customItemQty = Math.max(1, customItemQty + delta);
+  document.getElementById('custom-item-qty-display').textContent = customItemQty;
+}
+
+function addCustomItemToCart() {
+  const name  = document.getElementById('custom-item-name').value.trim();
+  const price = parseInt(document.getElementById('custom-item-price').value) || 0;
+  const note  = document.getElementById('custom-item-note').value.trim();
+  if (!name) { showToast('⚠️ Nama item wajib diisi!','warning'); return; }
+  if (price <= 0) { showToast('⚠️ Harga harus lebih dari 0!','warning'); return; }
+
+  const displayName = note ? `${name} (${note})` : name;
+  // Add each qty individually or handle as one block
+  const ex = pesananCart.find(i => i.name === displayName && i.isCustom);
+  if (ex) { ex.qty += customItemQty; }
+  else { pesananCart.push({ name: displayName, icon: '✏️', price, qty: customItemQty, isCustom: true }); }
+
+  bootstrap.Modal.getInstance(document.getElementById('customItemModal')).hide();
+  renderCartUI('pesanan');
+  showToast(`✅ Pesanan custom "${name}" ditambahkan!`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CART
+// ═══════════════════════════════════════════════════════════
+function escAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+function addToCart(mode, name, icon, price) {
+  const cartArr = mode === 'pesanan' ? pesananCart : belanjaCart;
+  const ex = cartArr.find(i => i.name === name);
+  if (ex) { ex.qty++; } else { cartArr.push({ name, icon, price, qty:1 }); }
+  renderCartUI(mode);
+}
+
+function changeQty(mode, name, delta) {
+  const cartArr = mode === 'pesanan' ? pesananCart : belanjaCart;
+  const item = cartArr.find(i => i.name === name);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cartArr.splice(cartArr.indexOf(item),1);
+  renderCartUI(mode);
+}
+
+function clearCart(mode) {
+  if (mode === 'pesanan') pesananCart = []; else belanjaCart = [];
+  renderCartUI(mode);
+}
+
+function renderCartUI(mode) {
+  const cartArr   = mode === 'pesanan' ? pesananCart : belanjaCart;
+  const container = document.getElementById(mode+'-cart-items');
+  const totalEl   = document.getElementById(mode+'-total-val');
+
+  if (cartArr.length === 0) {
+    container.innerHTML = `<div class="text-center text-secondary p-4">
+      <i class="bi bi-cart-x" style="font-size:2.5rem;"></i>
+      <div class="mt-2" style="font-size:.82rem;">${mode==='pesanan'?'Keranjang masih kosong':'Belum ada item belanja'}</div>
+    </div>`;
+    totalEl.textContent = fmt(0);
+    if (mode === 'pesanan') updateKembalian();
+    return;
+  }
+
+  let html = ''; let total = 0;
+  cartArr.forEach(item => {
+    const line = item.price * item.qty;
+    total += line;
+    const safeName = escAttr(item.name);
+    html += `<div class="cart-item d-flex align-items-center gap-2">
+      <span style="font-size:1.3rem;">${item.icon}</span>
+      <div class="flex-fill" style="min-width:0;">
+        <div style="font-size:.8rem;font-weight:700;line-height:1.2;">${item.name}${item.isCustom?'<span class="custom-item-badge ms-1">custom</span>':''}</div>
+        <div class="mono" style="font-size:.72rem;color:var(--brand)">${fmt(item.price)}</div>
+      </div>
+      <div class="d-flex align-items-center gap-1 flex-shrink-0">
+        <button class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size:.8rem;" onclick="changeQty('${mode}','${safeName}',-1)">−</button>
+        <span class="mono" style="font-size:.82rem;width:20px;text-align:center;">${item.qty}</span>
+        <button class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size:.8rem;" onclick="changeQty('${mode}','${safeName}',1)">+</button>
+      </div>
+      <div class="mono text-end flex-shrink-0" style="font-size:.78rem;min-width:65px;">${fmt(line)}</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  totalEl.textContent = fmt(total);
+  if (mode === 'pesanan') updateKembalian();
+}
+
+function checkoutPesanan() {
+  if (pesananCart.length === 0) { showToast('⚠️ Keranjang masih kosong!','warning'); return; }
+  const total    = getPesananTotal();
+  const bayar    = parseInt(document.getElementById('pesanan-bayar').value) || 0;
+  const method   = document.getElementById('pesanan-payment-method').value;
+  const customer = document.getElementById('pesanan-customer').value.trim() || 'Pelanggan';
+  const items    = pesananCart.map(i => `${i.name} x${i.qty}`).join(', ');
+  const hasCustom = pesananCart.some(i => i.isCustom);
+
+  let paid, debt, status;
+  if (bayar === 0) { paid=0; debt=total; status='hutang'; }
+  else if (bayar >= total) { paid=total; debt=0; status='lunas'; }
+  else { paid=bayar; debt=total-bayar; status='sebagian'; }
+
+  const tx = {
+    id: txCounter++, time: nowStr(),
+    customer, items,
+    desc: `[Pesanan] ${customer} — ${items}`,
+    type: 'pesanan', total, paid, debt, method, status,
+    kembalian: bayar > total ? bayar-total : 0,
+    hasCustom,
+    dateISO: new Date().toISOString().slice(0,10)
+  };
+  transactions.unshift(tx);
+  saveData();
+
+  let kembalianInfo = '';
+  if (tx.kembalian > 0) kembalianInfo = `<br><span class="text-success">Kembalian: ${fmt(tx.kembalian)}</span>`;
+  if (debt > 0) kembalianInfo += `<br><span style="color:var(--warn)">Hutang dicatat: ${fmt(debt)}</span>`;
+
+  document.getElementById('success-modal-body').innerHTML = `
+    <div class="mb-1"><b>Pelanggan:</b> ${customer}</div>
+    <div class="mb-1"><b>Item:</b> ${items}</div>
+    <div class="mb-1"><b>Total:</b> ${fmt(total)}</div>
+    <div class="mb-1"><b>Dibayar:</b> ${fmt(paid)} (${method})</div>
+    ${kembalianInfo}
+    <div class="mt-2"><span class="badge ${statusBadge(status)}">${statusLabel(status)}</span></div>
+  `;
+  new bootstrap.Modal(document.getElementById('successModal')).show();
+  pesananCart = [];
+  document.getElementById('pesanan-bayar').value = '';
+  document.getElementById('pesanan-customer').value = '';
+  renderCartUI('pesanan');
+  updateHome();
+}
+
+// ═══════════════════════════════════════════════════════════
+// BELANJA
+// ═══════════════════════════════════════════════════════════
+function addBelanjaItem() {
+  const name  = document.getElementById('belanja-item-name').value.trim();
+  const price = parseInt(document.getElementById('belanja-item-price').value) || 0;
+  if (!name) { showToast('⚠️ Nama item wajib diisi!','warning'); return; }
+  if (price <= 0) { showToast('⚠️ Harga harus lebih dari 0!','warning'); return; }
+  addToCart('belanja', name, '🛒', price);
+  document.getElementById('belanja-item-name').value = '';
+  document.getElementById('belanja-item-price').value = '';
+}
+
+function checkoutBelanja() {
+  if (belanjaCart.length === 0) { showToast('⚠️ Keranjang belanja kosong!','warning'); return; }
+  const total = belanjaCart.reduce((s,i) => s+i.price*i.qty, 0);
+  const kasir = document.getElementById('belanja-kasir-name').value.trim() || 'Kasir';
+  const items = belanjaCart.map(i => `${i.name} x${i.qty}`).join(', ');
+  const tx = {
+    id: txCounter++, time: nowStr(),
+    customer: kasir, items,
+    desc: `[Belanja] ${kasir} — ${items}`,
+    type: 'belanja', total, paid: total, debt: 0,
+    method: 'Tunai', status: 'pengeluaran', kembalian: 0,
+    dateISO: new Date().toISOString().slice(0,10)
+  };
+  transactions.unshift(tx);
+  saveData();
+  document.getElementById('success-modal-body').innerHTML = `
+    <div class="mb-1"><b>Kasir:</b> ${kasir}</div>
+    <div class="mb-1"><b>Item:</b> ${items}</div>
+    <div class="mb-1 text-danger"><b>Total Pengeluaran:</b> ${fmt(total)}</div>
+    <div class="mt-2"><span class="badge badge-danger-soft">🛒 Pengeluaran</span></div>
+  `;
+  new bootstrap.Modal(document.getElementById('successModal')).show();
+  belanjaCart = [];
+  document.getElementById('belanja-kasir-name').value = '';
+  renderCartUI('belanja');
+  updateHome();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRODUK CRUD
+// ═══════════════════════════════════════════════════════════
+function renderProdukPage() {
+  const search  = document.getElementById('produk-search').value.toLowerCase();
+  const cat     = document.getElementById('produk-filter-cat').value;
+  const list    = PRODUCTS.filter(p => {
+    const matchCat  = !cat || p.cat === cat;
+    const matchSrch = !search || p.name.toLowerCase().includes(search) || p.cat.toLowerCase().includes(search);
+    return matchCat && matchSrch;
+  });
+
+  const grouped = {};
+  list.forEach(p => { if (!grouped[p.cat]) grouped[p.cat]=[]; grouped[p.cat].push(p); });
+
+  const grid = document.getElementById('produk-grid');
+  if (list.length === 0) {
+    grid.innerHTML = '<div class="col-12 text-secondary text-center py-4">Produk tidak ditemukan.</div>';
+    return;
+  }
+
+  let html = '';
+  Object.entries(grouped).forEach(([catName, prods]) => {
+    html += `<div class="col-12"><div class="text-brand fw-bold mb-2" style="font-size:.72rem;text-transform:uppercase;letter-spacing:1px;">— ${catName}</div></div>`;
+    prods.forEach((p, _) => {
+      const realIdx = PRODUCTS.indexOf(p);
+      html += `<div class="col-6 col-md-4 col-xl-3">
+        <div class="product-card" style="cursor:default;position:relative;">
+          <div class="product-body">
+            <div class="product-category">${p.cat}</div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">${fmt(p.price)}</div>
+          </div>
+          <div class="produk-action-btn position-absolute top-0 end-0 m-2 d-flex gap-1">
+            <button class="btn btn-xs py-0 px-2" style="background:rgba(56,189,248,.15);color:var(--info);font-size:.7rem;" onclick="openProdukModal(${realIdx})">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-xs py-0 px-2" style="background:rgba(255,94,107,.15);color:var(--danger);font-size:.7rem;" onclick="deleteProduk(${realIdx})">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  grid.innerHTML = html;
+}
+
+function openProdukModal(idx) {
+  document.getElementById('produk-edit-idx').value = idx !== undefined ? idx : '';
+  if (idx !== undefined && PRODUCTS[idx]) {
+    const p = PRODUCTS[idx];
+    document.getElementById('produkModalTitle').innerHTML = '<i class="bi bi-pencil me-2 text-brand"></i>Edit Produk';
+    document.getElementById('produk-form-name').value  = p.name;
+    document.getElementById('produk-form-cat').value   = p.cat;
+    document.getElementById('produk-form-price').value = p.price;
+    document.getElementById('produk-form-icon').value  = p.icon;
+  } else {
+    document.getElementById('produkModalTitle').innerHTML = '<i class="bi bi-plus-circle me-2 text-brand"></i>Tambah Produk';
+    document.getElementById('produk-form-name').value  = '';
+    document.getElementById('produk-form-cat').value   = 'Spesial Indomie';
+    document.getElementById('produk-form-price').value = '';
+    document.getElementById('produk-form-icon').value  = '';
+  }
+  new bootstrap.Modal(document.getElementById('produkModal')).show();
+}
+
+function saveProduk() {
+  const name  = document.getElementById('produk-form-name').value.trim();
+  const cat   = document.getElementById('produk-form-cat').value;
+  const price = parseInt(document.getElementById('produk-form-price').value) || 0;
+  const icon  = document.getElementById('produk-form-icon').value.trim() || '🍽';
+
+  if (!name) { showToast('⚠️ Nama produk wajib diisi!','warning'); return; }
+  if (price <= 0) { showToast('⚠️ Harga harus lebih dari 0!','warning'); return; }
+
+  const idx = document.getElementById('produk-edit-idx').value;
+  if (idx !== '') {
+    PRODUCTS[parseInt(idx)] = { name, cat, price, icon };
+    showToast('✅ Produk berhasil diperbarui!');
+  } else {
+    PRODUCTS.push({ name, cat, price, icon });
+    showToast('✅ Produk berhasil ditambahkan!');
+  }
+
+  saveData();
+  bootstrap.Modal.getInstance(document.getElementById('produkModal')).hide();
+  renderProdukPage();
+  renderPesananProducts('semua');
+  // Reset cat buttons
+  document.querySelectorAll('#cat-buttons-pesanan .cat-btn').forEach(b => {
+    b.classList.remove('active'); b.classList.add('btn-outline-secondary');
+  });
+  document.querySelector('#cat-buttons-pesanan [data-cat="semua"]').classList.add('active');
+  document.querySelector('#cat-buttons-pesanan [data-cat="semua"]').classList.remove('btn-outline-secondary');
+}
+
+function deleteProduk(idx) {
+  if (!confirm(`Hapus produk "${PRODUCTS[idx].name}"?`)) return;
+  PRODUCTS.splice(idx, 1);
+  saveData();
+  renderProdukPage();
+  renderPesananProducts('semua');
+  showToast('🗑️ Produk dihapus.','warning');
+}
+
+// ═══════════════════════════════════════════════════════════
+// RIWAYAT TRANSAKSI (CARDS + CSV)
+// ═══════════════════════════════════════════════════════════
+function renderRiwayat() {
+  const list = transactions; // no filtering
+  const listEl = document.getElementById('riwayat-list');
+
+  // Summary
+  const pesananOnly = list.filter(t => t.type === 'pesanan');
+  const belanjaOnly = list.filter(t => t.type === 'belanja');
+  const sumQR     = pesananOnly.filter(t => t.method === 'QR').reduce((s,t) => s+t.paid, 0);
+  const sumTunai  = pesananOnly.filter(t => t.method === 'Tunai').reduce((s,t) => s+t.paid, 0);
+  const sumDebt   = pesananOnly.reduce((s,t) => s+t.debt, 0);
+  const sumExp    = belanjaOnly.reduce((s,t) => s+t.total, 0);
+  const omzet     = Math.max(0, sumQR + sumTunai - sumExp);
+  const sumTotal  = list.reduce((s,t) => s+t.total, 0);
+
+  const txPesanan = pesananOnly.length;
+  const txBelanja = belanjaOnly.length;
+  const pctQR     = (sumQR + sumTunai) > 0 ? Math.round(sumQR / (sumQR + sumTunai) * 100) : 0;
+  const pctTunai  = 100 - pctQR;
+  const hutangCount = pesananOnly.filter(t => t.debt > 0).length;
+
+  document.getElementById('rwyt-summary-row').innerHTML = `
+    <!-- TRANSAKSI -->
+    <div class="col-6 col-lg-4">
+      <div class="rwyt-stat-card rwyt-card-transaksi">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="rwyt-icon-wrap" style="background:rgba(56,189,248,.12);color:#38bdf8;">
+            <i class="bi bi-receipt-cutoff"></i>
+          </div>
+          <div class="rwyt-card-label">Transaksi</div>
+        </div>
+        <div class="rwyt-card-val" style="color:#38bdf8;">${list.length}</div>
+        <div class="rwyt-card-sub">
+          <span class="rwyt-card-badge" style="background:rgba(56,189,248,.12);color:#38bdf8;">${txPesanan} pesanan</span>
+          <span class="rwyt-card-badge" style="background:rgba(255,94,107,.12);color:#ff5e6b;">${txBelanja} belanja</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAYAR QR -->
+    <div class="col-6 col-lg-4">
+      <div class="rwyt-stat-card rwyt-card-qr">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="rwyt-icon-wrap" style="background:rgba(167,139,250,.12);color:#a78bfa;">
+            <i class="bi bi-qr-code-scan"></i>
+          </div>
+          <div class="rwyt-card-label">Bayar lewat QR</div>
+        </div>
+        <div class="rwyt-card-val" style="color:#a78bfa;">${fmt(sumQR)}</div>
+        <div class="rwyt-card-sub">
+          <div style="flex:1;background:rgba(167,139,250,.12);border-radius:20px;height:4px;overflow:hidden;">
+            <div style="width:${pctQR}%;height:100%;background:#a78bfa;border-radius:20px;transition:width .5s;"></div>
+          </div>
+          <span style="font-size:.65rem;color:#a78bfa;font-weight:700;">${pctQR}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAYAR TUNAI -->
+    <div class="col-6 col-lg-4">
+      <div class="rwyt-stat-card rwyt-card-tunai">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="rwyt-icon-wrap" style="background:rgba(0,229,160,.12);color:#00e5a0;">
+            <i class="bi bi-cash-stack"></i>
+          </div>
+          <div class="rwyt-card-label">Bayar Tunai</div>
+        </div>
+        <div class="rwyt-card-val" style="color:#00e5a0;">${fmt(sumTunai)}</div>
+        <div class="rwyt-card-sub">
+          <div style="flex:1;background:rgba(0,229,160,.12);border-radius:20px;height:4px;overflow:hidden;">
+            <div style="width:${pctTunai}%;height:100%;background:#00e5a0;border-radius:20px;transition:width .5s;"></div>
+          </div>
+          <span style="font-size:.65rem;color:#00e5a0;font-weight:700;">${pctTunai}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOTAL HUTANG -->
+    <div class="col-6 col-lg-4">
+      <div class="rwyt-stat-card rwyt-card-hutang">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="rwyt-icon-wrap" style="background:rgba(245,158,11,.12);color:#f59e0b;">
+            <i class="bi bi-exclamation-circle-fill"></i>
+          </div>
+          <div class="rwyt-card-label">Total Hutang</div>
+        </div>
+        <div class="rwyt-card-val" style="color:#f59e0b;">${fmt(sumDebt)}</div>
+        <div class="rwyt-card-sub">
+          ${hutangCount > 0
+            ? `<span class="rwyt-card-badge" style="background:rgba(245,158,11,.15);color:#f59e0b;"><i class="bi bi-person-fill me-1"></i>${hutangCount} pelanggan belum lunas</span>`
+            : `<span class="rwyt-card-badge" style="background:rgba(0,229,160,.12);color:#00e5a0;"><i class="bi bi-check-circle me-1"></i>Semua lunas</span>`
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- PENGELUARAN -->
+    <div class="col-6 col-lg-4">
+      <div class="rwyt-stat-card rwyt-card-pengeluaran">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="rwyt-icon-wrap" style="background:rgba(255,94,107,.12);color:#ff5e6b;">
+            <i class="bi bi-bag-dash-fill"></i>
+          </div>
+          <div class="rwyt-card-label">Pengeluaran</div>
+        </div>
+        <div class="rwyt-card-val" style="color:#ff5e6b;">${fmt(sumExp)}</div>
+        <div class="rwyt-card-sub">
+          <span class="rwyt-card-badge" style="background:rgba(255,94,107,.12);color:#ff5e6b;">${txBelanja} catatan belanja</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OMZET -->
+    <div class="col-6 col-lg-4">
+      <div class="rwyt-stat-card rwyt-card-omzet">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="rwyt-icon-wrap" style="background:rgba(0,229,160,.15);color:#00e5a0;">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <div class="rwyt-card-label" style="color:var(--brand);">Omzet Bersih</div>
+        </div>
+        <div class="rwyt-card-val" style="color:#00e5a0;">${fmt(omzet)}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('rwyt-count-info').textContent = `${list.length} transaksi`;
+  document.getElementById('rwyt-total-info').textContent = list.length > 0 ? `Total keseluruhan: ${fmt(sumTotal)}` : '';
+
+  if (list.length === 0) {
+    listEl.innerHTML = `
+      <div class="tx-card text-center py-5">
+        <i class="bi bi-clock-history" style="font-size:2.5rem;opacity:.3;color:var(--muted);"></i>
+        <div class="mt-3 text-secondary" style="font-size:.88rem;">Belum ada transaksi.</div>
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = list.map((tx, i) => {
+    const isPesanan = tx.type === 'pesanan';
+    const cardClass = tx.status === 'hutang' || tx.status === 'sebagian' ? 'tx-hutang' : (isPesanan ? 'tx-pesanan' : 'tx-belanja');
+
+    let amountsHtml = `
+      <div class="tx-amount-item">
+        <span class="tx-amount-label">Total</span>
+        <span class="tx-amount-val">${fmt(tx.total)}</span>
+      </div>`;
+
+    if (isPesanan) {
+      amountsHtml += `
+        <div class="tx-amount-item">
+          <span class="tx-amount-label">Dibayar</span>
+          <span class="tx-amount-val" style="color:#00e5a0;">${fmt(tx.paid)}</span>
+        </div>`;
+      if (tx.debt > 0) {
+        amountsHtml += `
+          <div class="tx-amount-item">
+            <span class="tx-amount-label">Hutang</span>
+            <span class="tx-amount-val" style="color:var(--warn);">${fmt(tx.debt)}</span>
+          </div>`;
+      }
+      if (tx.kembalian > 0) {
+        amountsHtml += `
+          <div class="tx-amount-item">
+            <span class="tx-amount-label">Kembalian</span>
+            <span class="tx-amount-val" style="color:#00e5a0;">${fmt(tx.kembalian)}</span>
+          </div>`;
+      }
+    }
+
+    return `
+      <div class="tx-card ${cardClass}">
+        <div class="tx-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <span class="tx-card-id">#${tx.id}</span>
+            <span class="badge ${isPesanan ? 'badge-success-soft' : 'badge-danger-soft'}" style="font-size:.62rem;">
+              ${isPesanan ? '🧾 Pesanan' : '🛒 Belanja'}
+            </span>
+            ${tx.hasCustom ? '<span class="custom-item-badge">custom</span>' : ''}
+          </div>
+          <span class="tx-card-time"><i class="bi bi-clock me-1" style="font-size:.65rem;"></i>${tx.time}</span>
+        </div>
+
+        <div class="tx-card-customer">${tx.customer || '-'}</div>
+        <div class="tx-card-items" title="${tx.items || tx.desc}">
+          <i class="bi bi-bag me-1" style="font-size:.7rem;color:var(--muted);"></i>${tx.items || tx.desc}
+        </div>
+
+        <div class="tx-card-amounts" style="display:flex;gap:.6rem;flex-wrap:nowrap;align-items:center;margin-bottom:.45rem;">${amountsHtml}</div>
+        <div class="tx-card-badges" style="display:flex;align-items:center;gap:.3rem;flex-wrap:nowrap;">
+            ${tx.paid > 0 ? `<span class="badge badge-info-soft" style="font-size:.62rem;white-space:nowrap;">${tx.method}</span>` : ''}
+            <span class="badge ${statusBadge(tx.status)}" style="font-size:.62rem;white-space:nowrap;">${statusLabel(tx.status)}</span>
+            ${(tx.status === 'hutang' || tx.status === 'sebagian') ? `
+            <button class="btn btn-xs py-0 px-2" style="font-size:.7rem;background:rgba(245,158,11,.15);color:var(--warn);border-radius:6px;white-space:nowrap;" onclick="openBayarHutang(${i})">
+              <i class="bi bi-cash-coin me-1"></i>Bayar
+            </button>` : ''}
+            <button class="btn btn-xs py-0 px-2" style="font-size:.7rem;background:rgba(56,189,248,.12);color:var(--info);border-radius:6px;white-space:nowrap;" onclick="showTxDetail(${i})">
+              <i class="bi bi-eye me-1"></i>Detail
+            </button>
+            <button class="btn btn-xs py-0 px-2" style="font-size:.7rem;background:rgba(255,94,107,.12);color:var(--danger);border-radius:6px;" onclick="deleteTx(${i})">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+      </div>`;
+  }).join('');
+}
+
+function showTxDetail(idx) {
+  const tx = transactions[idx];
+  if (!tx) return;
+  document.getElementById('tx-detail-body').innerHTML = `
+    <div class="row g-2" style="font-size:.85rem;">
+      <div class="col-5 text-secondary">ID Transaksi</div><div class="col-7 mono fw-bold">#${tx.id}</div>
+      <div class="col-5 text-secondary">Waktu</div><div class="col-7">${tx.time}</div>
+      <div class="col-5 text-secondary">Pelanggan / Kasir</div><div class="col-7 fw-bold">${tx.customer||'-'}</div>
+      <div class="col-5 text-secondary">Item Pesanan</div><div class="col-7">${tx.items||tx.desc}</div>
+      <div class="col-5 text-secondary">Jenis</div><div class="col-7"><span class="badge ${tx.type==='pesanan'?'badge-success-soft':'badge-danger-soft'}">${tx.type==='pesanan'?'Pesanan':'Belanja'}</span>${tx.hasCustom?'<span class="custom-item-badge ms-1">custom</span>':''}</div>
+      <div class="col-5 text-secondary">Total</div><div class="col-7 mono text-brand fw-bold">${fmt(tx.total)}</div>
+      <div class="col-5 text-secondary">Dibayar</div><div class="col-7 mono" style="color:#00e5a0;">${fmt(tx.paid)}</div>
+      <div class="col-5 text-secondary">Hutang</div><div class="col-7 mono" style="color:${tx.debt>0?'var(--warn)':'var(--muted)'};">${tx.debt>0?fmt(tx.debt):'-'}</div>
+      <div class="col-5 text-secondary">Kembalian</div><div class="col-7 mono" style="color:${tx.kembalian>0?'#00e5a0':'var(--muted)'};">${tx.kembalian>0?fmt(tx.kembalian):'-'}</div>
+      <div class="col-5 text-secondary">Metode Bayar</div><div class="col-7"><span class="badge badge-info-soft">${tx.paid > 0 ? tx.method : '—'}</span></div>
+      <div class="col-5 text-secondary">Status</div><div class="col-7"><span class="badge ${statusBadge(tx.status)}">${statusLabel(tx.status)}</span></div>
+    </div>
+  `;
+  new bootstrap.Modal(document.getElementById('txDetailModal')).show();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT PDF
+// ═══════════════════════════════════════════════════════════
+
+function buildSummaryData(filtered) {
+  const rp = n => 'Rp ' + (n||0).toLocaleString('id-ID');
+  const pesananTx        = filtered.filter(tx => tx.type === 'pesanan');
+  const belanjaTx        = filtered.filter(tx => tx.type !== 'pesanan');
+  const jmlPelanggan     = pesananTx.length;
+  const jmlBelanjaKasir  = belanjaTx.length;
+  const totalPengeluaran = belanjaTx.reduce((s,tx) => s + (tx.total||0), 0);
+  const bayarQR  = pesananTx.filter(tx => /qr|qris|transfer/i.test(tx.method||''));
+  const bayarKes = pesananTx.filter(tx => /tunai|cash|kas/i.test(tx.method||''));
+  const hutangTx = pesananTx.filter(tx => (tx.debt||0) > 0);
+  const totalQR              = bayarQR.reduce((s,tx)  => s + (tx.total||0), 0);
+  const totalKes             = bayarKes.reduce((s,tx) => s + (tx.total||0), 0);
+  const totalHutang          = hutangTx.reduce((s,tx) => s + (tx.debt||0),  0);
+  const totalPendapatanBruto = pesananTx.reduce((s,tx)=> s + (tx.paid||0),  0);
+  const totalOmzet           = totalPendapatanBruto - totalPengeluaran;
+  return { rp, pesananTx, belanjaTx, jmlPelanggan, jmlBelanjaKasir, totalPengeluaran,
+           bayarQR, bayarKes, hutangTx, totalQR, totalKes, totalHutang,
+           totalPendapatanBruto, totalOmzet };
+}
+
+function _doExportPDF() {
+  if (typeof window.jspdf === 'undefined') {
+    showToast('Library PDF belum siap, coba lagi sebentar.', 'warning'); return;
+  }
+  const { jsPDF } = window.jspdf;
+  const filtered = transactions;
+  if (filtered.length === 0) { showToast('Tidak ada data untuk diexport!', 'warning'); return; }
+
+  const doc  = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const PW   = doc.internal.pageSize.getWidth();   // 210
+  const PH   = doc.internal.pageSize.getHeight();  // 297
+  const ML   = 12, MR = 12;
+  const CW   = PW - ML - MR;   // content width
+
+  const now     = new Date();
+  const tgl     = now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const jamStr  = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+  const rp      = n => 'Rp ' + (n||0).toLocaleString('id-ID');
+
+  // ─── Palet warna ───────────────────────────────
+  const G   = [0, 190, 140];      // hijau brand
+  const DK  = [18, 28, 48];       // gelap
+  const GR  = [90, 110, 140];     // abu
+  const LT  = [245, 248, 252];    // putih pucat (zebra)
+  const WT  = [255, 255, 255];
+  const RD  = [210, 40, 50];
+  const YL  = [200, 120, 10];
+  const BL  = [10, 120, 200];
+  const PU  = [110, 60, 210];
+
+  // ─── Hitung semua data ─────────────────────────
+  const pesananTx = filtered.filter(t => t.type === 'pesanan');
+  const belanjaTx = filtered.filter(t => t.type !== 'pesanan');
+  const hutangTx  = pesananTx.filter(t => (t.debt||0) > 0);
+  const bayarQR   = pesananTx.filter(t => /qr|qris|transfer/i.test(t.method||''));
+  const bayarKes  = pesananTx.filter(t => /tunai|cash|kas/i.test(t.method||''));
+
+  const jmlMasuk   = pesananTx.length;
+  const jmlKeluar  = belanjaTx.length;
+  const totPenglrn = belanjaTx.reduce((s,t) => s+(t.total||0), 0);
+  const totQR      = bayarQR.reduce((s,t)   => s+(t.total||0), 0);
+  const totKes     = bayarKes.reduce((s,t)  => s+(t.total||0), 0);
+  const totHutang  = hutangTx.reduce((s,t)  => s+(t.debt||0),  0);
+  const totBruto   = pesananTx.reduce((s,t) => s+(t.paid||0),  0);
+  const totOmzet   = totBruto - totPenglrn;
+
+  // ═══════════════════════════════════════════════
+  // HALAMAN 1 — RINGKASAN
+  // ═══════════════════════════════════════════════
+
+  // ── Header banner ──────────────────────────────
+  doc.setFillColor(...DK);
+  doc.rect(0, 0, PW, 40, 'F');
+  doc.setFillColor(...G);
+  doc.rect(0, 37, PW, 3, 'F');
+
+  // Logo bar hijau kiri
+  doc.setFillColor(...G);
+  doc.rect(ML, 8, 3, 24, 'F');
+
+  doc.setTextColor(...G);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(17);
+  doc.text('KASIR WARKOP CEMARA', ML+8, 19);
+
+  doc.setTextColor(200, 220, 210);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.text('Laporan Harian  |  ' + tgl, ML+8, 27);
+
+  doc.setTextColor(...GR);
+  doc.setFontSize(7.5);
+  doc.text('Dicetak pukul ' + jamStr, PW - MR, 27, { align:'right' });
+
+  let y = 50;
+
+  // ── Helper fungsi ──────────────────────────────
+  const newPageIfNeeded = (need) => {
+    if (y + need > PH - 14) {
+      addFooter();
+      doc.addPage();
+      y = 18;
+    }
+  };
+
+  const sectionHeader = (label, clr) => {
+    newPageIfNeeded(14);
+    doc.setFillColor(...(clr || DK));
+    doc.roundedRect(ML, y, CW, 9, 1.5, 1.5, 'F');
+    doc.setTextColor(...WT);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text(label.toUpperCase(), ML+4, y+6.2);
+    y += 12;
+  };
+
+  // baris statistik 2-kolom: label kiri, nilai kanan
+  const statRow = (label, val, valClr, bg, bold) => {
+    newPageIfNeeded(8);
+    const rowH = 8;
+    doc.setFillColor(...(bg || WT));
+    doc.rect(ML, y, CW, rowH, 'F');
+    // garis bawah tipis
+    doc.setDrawColor(225, 230, 240);
+    doc.setLineWidth(0.15);
+    doc.line(ML, y+rowH, ML+CW, y+rowH);
+
+    doc.setTextColor(...DK);
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.setFontSize(8.5);
+    doc.text(label, ML+4, y+5.5);
+
+    doc.setTextColor(...(valClr || DK));
+    doc.setFont('helvetica', 'bold');
+    doc.text(String(val), ML+CW-3, y+5.5, { align:'right' });
+    y += rowH;
+  };
+
+  const statRowAlt = (label, val, valClr) => statRow(label, val, valClr, LT);
+  const gap = (h) => { y += (h||5); };
+
+  // ──────────────────────────────────────────────
+  // SEKSI 1 — TRANSAKSI
+  // ──────────────────────────────────────────────
+  sectionHeader('Transaksi', BL);
+  statRow   ('Transaksi masuk  (pesanan pelanggan)', jmlMasuk  + ' transaksi', G);
+  statRowAlt('Transaksi keluar (belanja kasir)',     jmlKeluar + ' kali',      RD);
+  statRow   ('Total pengeluaran kasir',              rp(totPenglrn),           RD);
+  gap(6);
+
+  // ──────────────────────────────────────────────
+  // SEKSI 2 — METODE PEMBAYARAN
+  // ──────────────────────────────────────────────
+  sectionHeader('Metode Pembayaran', PU);
+  statRow   ('QR / Transfer  —  jumlah transaksi', bayarQR.length + ' transaksi', BL);
+  statRowAlt('QR / Transfer  —  total nominal',    rp(totQR),                     BL);
+  statRow   ('Kas / Tunai    —  jumlah transaksi', bayarKes.length + ' transaksi', G);
+  statRowAlt('Kas / Tunai    —  total nominal',    rp(totKes),                     G);
+  gap(6);
+
+  // ──────────────────────────────────────────────
+  // SEKSI 3 — HUTANG
+  // ──────────────────────────────────────────────
+  sectionHeader('Hutang Pelanggan', YL);
+  statRow   ('Jumlah pelanggan ngutang', hutangTx.length + ' orang', YL);
+  statRowAlt('Total nominal hutang',     rp(totHutang),               YL);
+
+  if (hutangTx.length > 0) {
+    gap(2);
+    // sub-header detail
+    doc.setFillColor(255, 248, 230);
+    doc.rect(ML, y, CW, 7, 'F');
+    doc.setTextColor(...YL);
+    doc.setFont('helvetica', 'bolditalic');
+    doc.setFontSize(8);
+    doc.text('Detail nama pelanggan hutang:', ML+4, y+5);
+    y += 7;
+
+    hutangTx.forEach((tx, i) => {
+      newPageIfNeeded(7);
+      const bg = i % 2 === 0 ? [255,252,240] : [255,248,225];
+      doc.setFillColor(...bg);
+      doc.rect(ML, y, CW, 7, 'F');
+      doc.setDrawColor(240, 220, 180);
+      doc.setLineWidth(0.15);
+      doc.line(ML, y+7, ML+CW, y+7);
+
+      // nomor
+      doc.setFillColor(...YL);
+      doc.circle(ML+7, y+3.5, 2.5, 'F');
+      doc.setTextColor(...WT);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.text(String(i+1), ML+7, y+4.5, { align:'center' });
+
+      doc.setTextColor(...DK);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.text(tx.customer || '-', ML+13, y+5);
+
+      doc.setTextColor(...YL);
+      doc.setFont('helvetica', 'bold');
+      doc.text(rp(tx.debt), ML+CW-3, y+5, { align:'right' });
+      y += 7;
+    });
+  }
+  gap(6);
+
+  // ──────────────────────────────────────────────
+  // SEKSI 4 — TOTAL OMZET (kotak besar)
+  // ──────────────────────────────────────────────
+  newPageIfNeeded(38);
+  const boxH = 36;
+  doc.setFillColor(...DK);
+  doc.roundedRect(ML, y, CW, boxH, 3, 3, 'F');
+
+  // Aksen kiri hijau
+  doc.setFillColor(...G);
+  doc.roundedRect(ML, y, 4, boxH, 2, 2, 'F');
+
+  // Label atas
+  doc.setTextColor(...G);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text('TOTAL OMZET BERSIH', ML+9, y+8);
+
+  // Baris kalkulasi
+  doc.setTextColor(170, 185, 200);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('Pendapatan bruto (dari pesanan)', ML+9, y+16);
+  doc.text('Pengeluaran kasir', ML+9, y+22);
+
+  doc.setTextColor(...WT);
+  doc.setFont('helvetica', 'bold');
+  doc.text(rp(totBruto),   ML+CW-5, y+16, { align:'right' });
+  doc.text('- ' + rp(totPenglrn), ML+CW-5, y+22, { align:'right' });
+
+  // Garis pemisah
+  doc.setDrawColor(60, 80, 110);
+  doc.setLineWidth(0.4);
+  doc.line(ML+8, y+25, ML+CW-4, y+25);
+
+  // Total besar
+  doc.setTextColor(...G);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.text(rp(totOmzet), ML+CW-5, y+33, { align:'right' });
+
+  y += boxH + 8;
+
+  // ═══════════════════════════════════════════════
+  // HALAMAN BERIKUTNYA — RIWAYAT TRANSAKSI
+  // ═══════════════════════════════════════════════
+  addFooter();
+  doc.addPage();
+  y = 18;
+
+  // Sub-header halaman tabel
+  doc.setFillColor(...DK);
+  doc.rect(0, 0, PW, 14, 'F');
+  doc.setTextColor(...G);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('RIWAYAT TRANSAKSI  —  ' + tgl, ML, 9.5);
+  doc.setTextColor(...GR);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.text(filtered.length + ' data', PW - MR, 9.5, { align:'right' });
+
+  const txBody = filtered.map((tx, i) => [
+    i + 1,
+    tx.time || '',
+    (tx.customer || '-').substring(0, 22),
+    (tx.items || tx.desc || '').substring(0, 35),
+    tx.type === 'pesanan' ? 'Pesanan' : 'Belanja',
+    rp(tx.total),
+    rp(tx.paid),
+    tx.debt > 0 ? rp(tx.debt) : '-',
+    (tx.method || '-').substring(0, 8),
+    statusLabel(tx.status).replace(/[^\w\s]/g,'').trim()
+  ]);
+
+  doc.autoTable({
+    startY: y,
+    head: [['#','Waktu','Pelanggan / Kasir','Item Pesanan','Jenis','Total','Dibayar','Hutang','Metode','Status']],
+    body: txBody,
+    theme: 'plain',
+    margin: { left: ML, right: MR },
+    styles: {
+      fontSize: 7.8,
+      cellPadding: { top:2.8, bottom:2.8, left:2.5, right:2.5 },
+      font: 'helvetica',
+      textColor: DK,
+      lineColor: [215, 222, 235],
+      lineWidth: 0.2,
+      overflow: 'ellipsize',
+    },
+    headStyles: {
+      fillColor: [30, 42, 68],
+      textColor: WT,
+      fontStyle: 'bold',
+      fontSize: 7.8,
+      lineColor: [30, 42, 68],
+    },
+    alternateRowStyles: { fillColor: LT },
+    columnStyles: {
+      0: { cellWidth: 7,   halign: 'center' },
+      1: { cellWidth: 13,  halign: 'center' },
+      2: { cellWidth: 30 },
+      3: { cellWidth: 'auto' },
+      4: { cellWidth: 16,  halign: 'center' },
+      5: { cellWidth: 22,  halign: 'right' },
+      6: { cellWidth: 22,  halign: 'right' },
+      7: { cellWidth: 20,  halign: 'right' },
+      8: { cellWidth: 13,  halign: 'center' },
+      9: { cellWidth: 16,  halign: 'center' },
+    },
+    didParseCell: (d) => {
+      if (d.section === 'body') {
+        if (d.column.index === 4) {
+          d.cell.styles.textColor = d.row.raw[4] === 'Pesanan' ? G : RD;
+          d.cell.styles.fontStyle = 'bold';
+        }
+        if (d.column.index === 7 && d.cell.raw !== '-') {
+          d.cell.styles.textColor = YL;
+          d.cell.styles.fontStyle = 'bold';
+        }
+        if (d.column.index === 5) {
+          d.cell.styles.textColor = d.row.raw[4] === 'Pesanan' ? [0,130,90] : RD;
+        }
+      }
+    },
+    willDrawCell: (d) => {
+      // Garis kiri berwarna per baris (Pesanan = hijau, Belanja = merah)
+      if (d.section === 'body' && d.column.index === 0) {
+        const clr = d.row.raw[4] === 'Pesanan' ? G : RD;
+        doc.setFillColor(...clr);
+        doc.rect(d.cell.x, d.cell.y, 1.5, d.cell.height, 'F');
+      }
+    },
+  });
+
+  // ── Footer semua halaman ──────────────────────
+  function addFooter() {
+    const pages = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= pages; p++) {
+      doc.setPage(p);
+      doc.setFillColor(...DK);
+      doc.rect(0, PH-10, PW, 10, 'F');
+      doc.setFillColor(...G);
+      doc.rect(0, PH-10, PW, 1, 'F');
+      doc.setTextColor(...GR);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.text('Kasir Warkop Cemara  \u2022  ' + tgl, ML, PH-4);
+      doc.text('Hal ' + p + ' / ' + pages, PW-MR, PH-4, { align:'right' });
+    }
+  }
+
+  addFooter();
+  doc.save('laporan_kasir_' + now.toISOString().slice(0,10) + '.pdf');
+  showToast('PDF berhasil dibuat!');
+}
+
+function exportPDF() {
+  _doExportPDF();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  markExportedToday(timeStr);
+  const barEl = document.getElementById('export-reminder-bar');
+  const barTimeEl = document.getElementById('reminder-bar-time');
+  if (barTimeEl) barTimeEl.textContent = timeStr;
+  if (barEl) barEl.classList.remove('hidden');
+}
+
+function gateExportPDF() {
+  _doExportPDF();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  markExportedToday(timeStr);
+  document.getElementById('export-gate').classList.add('hidden');
+  const barEl = document.getElementById('export-reminder-bar');
+  const barTimeEl = document.getElementById('reminder-bar-time');
+  if (barTimeEl) barTimeEl.textContent = timeStr;
+  if (barEl) barEl.classList.remove('hidden');
+  showToast('PDF berhasil diexport! Aplikasi terbuka.');
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════════════════════
+
+// Helper: bungkus field CSV dengan tanda kutip & escape internal quotes
+function csvQuote(val) {
+  return '"' + String(val ?? '').replace(/"/g, '""') + '"';
+}
+
+function buildSummaryRows(filtered) {
+  const rp = n => 'Rp ' + (n||0).toLocaleString('id-ID');
+  const pesananTx        = filtered.filter(tx => tx.type === 'pesanan');
+  const belanjaTx        = filtered.filter(tx => tx.type !== 'pesanan');
+  const jmlPelanggan     = pesananTx.length;
+  const jmlBelanjaKasir  = belanjaTx.length;
+  const totalPengeluaran = belanjaTx.reduce((s,tx) => s + (tx.total||0), 0);
+  const bayarQR  = pesananTx.filter(tx => /qr|qris|transfer/i.test(tx.method||''));
+  const bayarKes = pesananTx.filter(tx => /tunai|cash|kas/i.test(tx.method||''));
+  const hutangTx = pesananTx.filter(tx => (tx.debt||0) > 0);
+  const totalQR              = bayarQR.reduce((s,tx)  => s + (tx.total||0), 0);
+  const totalKes             = bayarKes.reduce((s,tx) => s + (tx.total||0), 0);
+  const totalHutang          = hutangTx.reduce((s,tx) => s + (tx.debt||0),  0);
+  const totalPendapatanBruto = pesananTx.reduce((s,tx)=> s + (tx.paid||0),  0);
+  const totalOmzet           = totalPendapatanBruto - totalPengeluaran;
+
+  const tanggal = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // Helper: baris 2-kolom (Keterangan, Nilai)
+  const r = (label, val) => [csvQuote(label), csvQuote(String(val))];
+  const sep = label => [csvQuote(label ? '── ' + label + ' ──' : ''), csvQuote('')];
+  const blank = () => [csvQuote(''), csvQuote('')];
+
+  // Daftar hutang per baris
+  const hutangLines = hutangTx.length === 0
+    ? [r('   (tidak ada)', '-')]
+    : hutangTx.map((tx,i) => r(`   ${i+1}. ${tx.customer||'-'}`, rp(tx.debt)));
+
+  return [
+    blank(),
+    blank(),
+    [csvQuote('================================================'), csvQuote('')],
+    [csvQuote('   RINGKASAN HARIAN — ' + tanggal), csvQuote('')],
+    [csvQuote('================================================'), csvQuote('')],
+    blank(),
+
+    sep('TRANSAKSI'),
+    r('Keterangan',                           'Nilai'),
+    r('1. Transaksi masuk (pesanan pelanggan)', jmlPelanggan + ' transaksi'),
+    r('2. Transaksi keluar (belanja kasir)',    jmlBelanjaKasir + ' kali'),
+    r('3. Total pengeluaran kasir',            rp(totalPengeluaran)),
+    blank(),
+
+    sep('HUTANG'),
+    r('4. Jumlah pelanggan ngutang',           hutangTx.length + ' orang'),
+    r('   Total nominal hutang',               rp(totalHutang)),
+    r('   Detail:',                            ''),
+    ...hutangLines,
+    blank(),
+
+    sep('METODE PEMBAYARAN'),
+    r('5. Bayar QR / Transfer — jumlah',      bayarQR.length + ' transaksi'),
+    r('   Bayar QR / Transfer — total',       rp(totalQR)),
+    r('6. Bayar Kas / Tunai — jumlah',        bayarKes.length + ' transaksi'),
+    r('   Bayar Kas / Tunai — total',         rp(totalKes)),
+    blank(),
+
+    sep('OMZET'),
+    r('   Pendapatan bruto (dari pesanan)',    rp(totalPendapatanBruto)),
+    r('   Pengeluaran kasir',                 rp(totalPengeluaran)),
+    r('7. TOTAL OMZET BERSIH',               rp(totalOmzet)),
+    blank(),
+    [csvQuote('================================================'), csvQuote('')],
+  ];
+}
+
+function _doExportCSV() {
+  const filtered = transactions;
+  if (filtered.length === 0) { showToast('⚠️ Tidak ada data untuk diexport!','warning'); return; }
+
+  const txHeaders = ['No','Waktu','Tanggal','Pelanggan / Kasir','Item Pesanan','Jenis','Total (Rp)','Dibayar (Rp)','Hutang (Rp)','Kembalian (Rp)','Metode Bayar','Status','Ada Custom'];
+  const rows = filtered.map((tx,i) => [
+    i + 1,
+    csvQuote(tx.time),
+    csvQuote(tx.dateISO||''),
+    csvQuote(tx.customer||''),
+    csvQuote(tx.items||tx.desc||''),
+    csvQuote(tx.type==='pesanan'?'Pesanan':'Belanja'),
+    tx.total,
+    tx.paid,
+    tx.debt,
+    tx.kembalian||0,
+    csvQuote(tx.method||''),
+    csvQuote(statusLabel(tx.status).replace(/[✅⚠️❌🛒]/g,'').trim()),
+    csvQuote(tx.hasCustom?'Ya':'Tidak')
+  ]);
+
+  const summaryRows = buildSummaryRows(filtered);
+
+  const csvContent = [
+    txHeaders.join(','),
+    ...rows.map(r => r.join(',')),
+    ...summaryRows.map(r => r.join(','))
+  ].join('\n');
+
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csvContent], { type:'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `riwayat_kasir_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✅ ${filtered.length} transaksi berhasil diexport!`);
+}
+
+function exportCSV() {
+  _doExportCSV();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  markExportedToday(timeStr);
+  const barEl = document.getElementById('export-reminder-bar');
+  const barTimeEl = document.getElementById('reminder-bar-time');
+  if (barTimeEl) barTimeEl.textContent = timeStr;
+  if (barEl) barEl.classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════
+// HAPUS TRANSAKSI
+// ═══════════════════════════════════════════════════════════
+function deleteTx(idx) {
+  const tx = transactions[idx];
+  if (!tx) return;
+  if (!confirm(`Hapus transaksi #${tx.id} — ${tx.customer || tx.desc}?`)) return;
+  transactions.splice(idx, 1);
+  saveData();
+  renderRiwayat();
+  updateHome();
+  showToast('🗑️ Transaksi dihapus.', 'warning');
+}
+
+function deleteAllTx() {
+  if (transactions.length === 0) { showToast('⚠️ Tidak ada transaksi untuk dihapus.', 'warning'); return; }
+  if (!confirm(`Hapus semua ${transactions.length} transaksi? Tindakan ini tidak bisa dibatalkan.`)) return;
+  transactions = [];
+  txCounter = 1;
+  saveData();
+  renderRiwayat();
+  updateHome();
+  showToast('🗑️ Semua transaksi dihapus.', 'warning');
+}
+
+// ═══════════════════════════════════════════════════════════
+// BAYAR HUTANG DARI RIWAYAT
+// ═══════════════════════════════════════════════════════════
+let currentBayarIdx = -1;
+let currentBayarMethod = 'Tunai';
+
+function selectBayarMethod(method) {
+  currentBayarMethod = method;
+  const tunaiBtn = document.getElementById('bayar-method-tunai');
+  const qrBtn    = document.getElementById('bayar-method-qr');
+  if (method === 'Tunai') {
+    tunaiBtn.className = 'btn btn-sm flex-fill fw-bold method-btn-active';
+    tunaiBtn.style.cssText = 'border-radius:8px;background:var(--brand);color:#0a0e13;border:none;';
+    qrBtn.className = 'btn btn-sm flex-fill fw-bold method-btn-inactive btn-outline-secondary';
+    qrBtn.style.cssText = 'border-radius:8px;';
+  } else {
+    qrBtn.className = 'btn btn-sm flex-fill fw-bold method-btn-active';
+    qrBtn.style.cssText = 'border-radius:8px;background:var(--brand);color:#0a0e13;border:none;';
+    tunaiBtn.className = 'btn btn-sm flex-fill fw-bold method-btn-inactive btn-outline-secondary';
+    tunaiBtn.style.cssText = 'border-radius:8px;';
+  }
+  updateBayarHutangInfo();
+}
+
+function updateBayarHutangInfo() {
+  const tx = transactions[currentBayarIdx];
+  if (!tx) return;
+  const amount = parseInt(document.getElementById('bayar-hutang-amount').value) || 0;
+  const remaining = tx.debt;
+  const resultEl = document.getElementById('bayar-hutang-result');
+  if (amount <= 0) { resultEl.innerHTML = ''; return; }
+  if (amount >= remaining) {
+    resultEl.innerHTML = `<span style="color:#00e5a0;">✅ Hutang lunas. Kembalian: ${fmt(amount - remaining)}</span>`;
+  } else {
+    resultEl.innerHTML = `<span style="color:var(--warn);">⚠️ Sisa hutang: ${fmt(remaining - amount)}</span>`;
+  }
+}
+
+function openBayarHutang(idx) {
+  const tx = transactions[idx];
+  if (!tx) return;
+  currentBayarIdx = idx;
+  currentBayarMethod = 'Tunai';
+  document.getElementById('bayar-hutang-amount').value = '';
+  document.getElementById('bayar-hutang-result').innerHTML = '';
+  document.getElementById('bayar-hutang-info').innerHTML = `
+    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:.75rem;">
+      <div class="fw-bold" style="font-size:.82rem;">${tx.customer || '-'} — <span class="mono">#${tx.id}</span></div>
+      <div class="mt-1" style="font-size:.78rem;color:var(--muted);">${tx.items || tx.desc}</div>
+      <div class="mt-2 d-flex gap-3" style="font-size:.82rem;">
+        <span>Total: <span class="mono fw-bold">${fmt(tx.total)}</span></span>
+        <span style="color:var(--warn);">Hutang: <span class="mono fw-bold">${fmt(tx.debt)}</span></span>
+      </div>
+    </div>`;
+  // Reset method buttons
+  selectBayarMethod('Tunai');
+  new bootstrap.Modal(document.getElementById('bayarHutangModal')).show();
+}
+
+function konfirmasiBayarHutang() {
+  const tx = transactions[currentBayarIdx];
+  if (!tx) return;
+  const amount = parseInt(document.getElementById('bayar-hutang-amount').value) || 0;
+  if (amount <= 0) { showToast('⚠️ Masukkan jumlah pembayaran!', 'warning'); return; }
+
+  const prevDebt = tx.debt;
+  const paid = Math.min(amount, prevDebt);
+  tx.paid += paid;
+  tx.debt  = prevDebt - paid;
+  // Simpan metode pelunasan sebagai field terpisah, jangan timpa metode asal
+  tx.hutangPayMethod = currentBayarMethod;
+
+  if (tx.debt === 0) {
+    tx.status = 'lunas';
+  } else {
+    tx.status = 'sebagian';
+  }
+
+  const kembalian = amount > prevDebt ? amount - prevDebt : 0;
+  saveData();
+  bootstrap.Modal.getInstance(document.getElementById('bayarHutangModal')).hide();
+  renderRiwayat();
+  updateHome();
+  showToast(`✅ Pembayaran ${fmt(paid)} via ${currentBayarMethod} dicatat!${kembalian > 0 ? ' Kembalian: ' + fmt(kembalian) : ''}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════════
+function updateHome() {
+  // Greeting & waktu
+  const hour = new Date().getHours();
+  let greet, emoji;
+  if      (hour >= 3  && hour < 9)  { greet = 'Selamat Pagi';   emoji = '☀️';  }
+  else if (hour >= 9  && hour < 15) { greet = 'Selamat Siang';  emoji = '🌤️'; }
+  else if (hour >= 15 && hour < 18) { greet = 'Selamat Sore';   emoji = '🌇'; }
+  else                               { greet = 'Selamat Malam';  emoji = '🌙'; }
+  const elGreet = document.getElementById('home-greeting');
+  if (elGreet) elGreet.textContent = greet + ' ' + emoji;
+
+  // Date string
+  const ds = document.getElementById('home-date-str');
+  if (ds) {
+    const now = new Date();
+    ds.textContent = now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+
+  const recentEl = document.getElementById('home-recent-list');
+  if (transactions.length === 0) {
+    recentEl.innerHTML = `<div class="text-center text-secondary py-5"><i class="bi bi-inbox" style="font-size:2rem;opacity:.3;"></i><div class="mt-2" style="font-size:.82rem;">Belum ada transaksi.</div></div>`;
+    return;
+  }
+  recentEl.innerHTML = transactions.slice(0, 8).map(tx => {
+    const isPesanan = tx.type === 'pesanan';
+    const dotColor  = tx.status === 'hutang' || tx.status === 'sebagian' ? '#f59e0b' : isPesanan ? '#00e5a0' : '#ff5e6b';
+    const sign      = isPesanan ? '+' : '−';
+    const valColor  = isPesanan ? '#00e5a0' : '#ff5e6b';
+    return `
+      <div class="home-tx-row">
+        <div class="home-tx-dot" style="background:${dotColor};"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${tx.customer || (isPesanan ? 'Pesanan' : 'Belanja')}</div>
+          <div style="font-size:.68rem;color:var(--muted);">${tx.time} · ${tx.items || tx.desc || ''}</div>
+        </div>
+        <div class="text-end" style="flex-shrink:0;">
+          <div class="mono fw-bold" style="font-size:.82rem;color:${valColor};">${sign}${fmt(tx.total)}</div>
+          <span class="badge ${statusBadge(tx.status)}" style="font-size:.58rem;">${statusLabel(tx.status)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PENGATURAN TAMPILAN — Tema, Font, Ukuran Teks
+// ═══════════════════════════════════════════════════════════
+
+const THEMES = {
+  default: { brand:'#00e5a0', brandDim:'#00b87a', glow:'rgba(0,229,160,.18)' },
+  blue:    { brand:'#38bdf8', brandDim:'#0ea5e9', glow:'rgba(56,189,248,.18)' },
+  purple:  { brand:'#a78bfa', brandDim:'#7c3aed', glow:'rgba(167,139,250,.18)' },
+  orange:  { brand:'#fb923c', brandDim:'#ea580c', glow:'rgba(251,146,60,.18)' },
+  rose:    { brand:'#fb7185', brandDim:'#e11d48', glow:'rgba(251,113,133,.18)' },
+  yellow:  { brand:'#fbbf24', brandDim:'#d97706', glow:'rgba(251,191,36,.18)' },
+  cyan:    { brand:'#22d3ee', brandDim:'#0891b2', glow:'rgba(34,211,238,.18)' },
+  lime:    { brand:'#a3e635', brandDim:'#65a30d', glow:'rgba(163,230,53,.18)' },
+};
+
+const FONT_URLS = {
+  'Inter':           'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
+  'Poppins':         'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap',
+  'Nunito':          'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap',
+  'Roboto':          'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
+  'DM Sans':         'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap',
+  'Plus Jakarta Sans': null, // already loaded
+};
+
+function applyTheme(btn) {
+  const key = btn.dataset.theme;
+  const t = THEMES[key];
+  if (!t) return;
+  const root = document.documentElement;
+  root.style.setProperty('--brand', t.brand);
+  root.style.setProperty('--brand-dim', t.brandDim);
+  root.style.setProperty('--brand-glow', t.glow);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('kasir_theme', key);
+  showToast('🎨 Tema berhasil diubah!');
+}
+
+function applyFont(btn) {
+  const font = btn.dataset.font;
+  const url = FONT_URLS[font];
+  if (url) {
+    // Inject font link if not already loaded
+    if (!document.querySelector(`link[data-font="${font}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet'; link.href = url;
+      link.setAttribute('data-font', font);
+      document.head.appendChild(link);
+    }
+  }
+  document.body.style.fontFamily = `'${font}', sans-serif`;
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('kasir_font', font);
+  showToast('🔤 Font berhasil diubah!');
+}
+
+function applySize(btn) {
+  const scale = parseFloat(btn.dataset.scale);
+  document.documentElement.style.fontSize = (16 * scale) + 'px';
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('kasir_size', scale);
+  showToast('🔠 Ukuran teks berhasil diubah!');
+}
+
+function resetTampilan() {
+  // Theme
+  document.documentElement.style.removeProperty('--brand');
+  document.documentElement.style.removeProperty('--brand-dim');
+  document.documentElement.style.removeProperty('--brand-glow');
+  // Font
+  document.body.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+  // Size
+  document.documentElement.style.fontSize = '16px';
+  // Reset active states
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  const defTheme = document.querySelector('.theme-btn[data-theme="default"]');
+  if (defTheme) defTheme.classList.add('active');
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  const defFont = document.querySelector('.font-btn[data-font="Plus Jakarta Sans"]');
+  if (defFont) defFont.classList.add('active');
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  const defSize = document.querySelector('.size-btn[data-scale="1"]');
+  if (defSize) defSize.classList.add('active');
+  // Clear storage
+  localStorage.removeItem('kasir_theme');
+  localStorage.removeItem('kasir_font');
+  localStorage.removeItem('kasir_size');
+  showToast('✅ Tampilan direset ke default!');
+}
+
+function loadSavedSettings() {
+  const theme = localStorage.getItem('kasir_theme');
+  const font  = localStorage.getItem('kasir_font');
+  const size  = localStorage.getItem('kasir_size');
+  if (theme) {
+    const btn = document.querySelector(`.theme-btn[data-theme="${theme}"]`);
+    if (btn) applyTheme(btn);
+  }
+  if (font) {
+    const btn = document.querySelector(`.font-btn[data-font="${font}"]`);
+    if (btn) applyFont(btn);
+  }
+  if (size) {
+    const btn = document.querySelector(`.size-btn[data-scale="${size}"]`);
+    if (btn) applySize(btn);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT GATE — Wajib Export CSV setiap hari setelah 06:00
+// ═══════════════════════════════════════════════════════════
+
+const EXPORT_GATE_KEY = 'kasir_csv_export_date'; // localStorage key
+
+function getTodayDateKey() {
+  return new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+}
+
+function isAfter6AM() {
+  const now = new Date();
+  return now.getHours() >= 6;
+}
+
+function hasExportedToday() {
+  const stored = localStorage.getItem(EXPORT_GATE_KEY);
+  if (!stored) return false;
+  try {
+    const { date } = JSON.parse(stored);
+    return date === getTodayDateKey();
+  } catch { return false; }
+}
+
+function markExportedToday(timeStr) {
+  localStorage.setItem(EXPORT_GATE_KEY, JSON.stringify({
+    date: getTodayDateKey(),
+    time: timeStr
+  }));
+}
+
+function getLastExportTime() {
+  const stored = localStorage.getItem(EXPORT_GATE_KEY);
+  if (!stored) return null;
+  try { return JSON.parse(stored).time; } catch { return null; }
+}
+
+function checkExportGate() {
+  const gateEl = document.getElementById('export-gate');
+  const barEl  = document.getElementById('export-reminder-bar');
+  const barTimeEl = document.getElementById('reminder-bar-time');
+
+  if (!isAfter6AM()) {
+    // Sebelum jam 6 pagi — tidak perlu gate
+    gateEl.classList.add('hidden');
+    return;
+  }
+
+  if (hasExportedToday()) {
+    // Sudah export hari ini — tampilkan reminder bar saja
+    gateEl.classList.add('hidden');
+    const lastTime = getLastExportTime();
+    if (lastTime && barTimeEl) {
+      barTimeEl.textContent = lastTime;
+      barEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  // Belum export & sudah lewat jam 6 — BLOKIR
+  const infoEl = document.getElementById('gate-last-export-info');
+  const stored = localStorage.getItem(EXPORT_GATE_KEY);
+  if (stored) {
+    try {
+      const { date, time } = JSON.parse(stored);
+      if (infoEl) infoEl.textContent = `Terakhir export: ${date} pukul ${time}`;
+    } catch { /* ignore */ }
+  } else {
+    if (infoEl) infoEl.textContent = 'Belum pernah export hari ini';
+  }
+  gateEl.classList.remove('hidden');
+}
+
+function gateExportCSV() {
+  const filtered = transactions;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+
+  const txHeaders = ['No','Waktu','Tanggal','Pelanggan / Kasir','Item Pesanan','Jenis','Total (Rp)','Dibayar (Rp)','Hutang (Rp)','Kembalian (Rp)','Metode Bayar','Status','Ada Custom'];
+  let csvContent;
+
+  if (filtered.length === 0) {
+    csvContent = txHeaders.join(',');
+  } else {
+    const rows = filtered.map((tx,i) => [
+      i + 1,
+      csvQuote(tx.time),
+      csvQuote(tx.dateISO||''),
+      csvQuote(tx.customer||''),
+      csvQuote(tx.items||tx.desc||''),
+      csvQuote(tx.type==='pesanan'?'Pesanan':'Belanja'),
+      tx.total,
+      tx.paid,
+      tx.debt,
+      tx.kembalian||0,
+      csvQuote(tx.method||''),
+      csvQuote(statusLabel(tx.status).replace(/[\u2705\u26A0\uFE0F\u274C\uD83D\uDED2]/g,'').trim()),
+      csvQuote(tx.hasCustom?'Ya':'Tidak')
+    ]);
+
+    const summaryRows = buildSummaryRows(filtered);
+    csvContent = [txHeaders.join(','), ...rows.map(r => r.join(',')), ...summaryRows.map(r => r.join(','))].join('\n');
+  }
+
+  const suffix = filtered.length === 0 ? '_kosong' : '';
+  const bom  = '\uFEFF';
+  const blob = new Blob([bom + csvContent], { type:'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `riwayat_kasir_${getTodayDateKey()}${suffix}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+    // Tandai sudah export & tutup gate
+  markExportedToday(timeStr);
+  document.getElementById('export-gate').classList.add('hidden');
+
+  // Tampilkan reminder bar
+  const barEl = document.getElementById('export-reminder-bar');
+  const barTimeEl = document.getElementById('reminder-bar-time');
+  if (barTimeEl) barTimeEl.textContent = timeStr;
+  if (barEl) barEl.classList.remove('hidden');
+
+  showToast(`✅ Export CSV berhasil — ${filtered.length} transaksi! Aplikasi terbuka.`);
+}
+
+// exportCSV sudah digabung langsung di definisi fungsinya di atas (markExportedToday + reminder bar)
+
+// Cek gate setiap menit (supaya otomatis muncul kalau jam 06 lewat saat app terbuka)
+setInterval(checkExportGate, 60 * 1000);
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+renderPesananProducts('semua');
+renderProdukPage();
+renderCartUI('pesanan');
+renderCartUI('belanja');
+updateHome();
+loadSavedSettings();
+applyTimedMode(); // Set tema & sapaan sesuai waktu saat load
+checkExportGate();
+</script>
+</body>
+</html>
